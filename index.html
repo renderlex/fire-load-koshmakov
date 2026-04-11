@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FormulyWord — Формули з фото у Word</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ===== HEADER / NAV ===== -->
+<header class="header">
+    <nav class="nav container">
+        <div class="logo">
+            <span class="logo-bracket">{</span>
+            <span class="logo-text">FormulyWord</span>
+            <span class="logo-bracket">}</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#features">Можливості</a></li>
+            <li><a href="#how-it-works">Як працює</a></li>
+            <li><a href="#usage">Використання</a></li>
+            <li><a href="#download" class="btn-nav">Завантажити</a></li>
+        </ul>
+        <button class="burger" aria-label="Меню">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-bg-code" aria-hidden="true">
+        <pre><code>Image → LaTeX (OCR) → MathML → OMML → Word</code></pre>
+    </div>
+    <div class="container hero-content">
+        <div class="terminal-badge">~ $ ./formulyword</div>
+        <h1>
+            Розпізнай формулу з <span class="highlight">фото</span><br>
+            та вставляй у <span class="highlight">Word</span>
+        </h1>
+        <p class="hero-sub">
+            Нейромережа розпізнає математичну формулу із зображення та вставляє її у Word-документ
+            як <strong>нативний об'єкт</strong> — не картинку. Безкоштовно та open-source.
+        </p>
+        <div class="hero-buttons">
+            <a href="#download" class="btn btn-primary">
+                <span class="btn-icon">↓</span> Завантажити .exe
+            </a>
+            <a href="#how-it-works" class="btn btn-outline">Дізнатися більше</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-value">pix2tex</span>
+                <span class="stat-label">OCR Engine</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-value">OMML</span>
+                <span class="stat-label">Native Word</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-value">2 мови</span>
+                <span class="stat-label">UA / EN</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features" class="section">
+    <div class="container">
+        <h2 class="section-title">
+            <span class="comment">// </span>Можливості
+        </h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📷</div>
+                <h3>Розпізнавання з фото</h3>
+                <p>Відкрийте зображення або вставте скріншот з буфера обміну. Виділіть мишкою потрібну формулу.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Нейромережа pix2tex</h3>
+                <p>AI-модель розпізнає формулу та повертає точний LaTeX-код. Підтримує складні математичні вирази.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⌨️</div>
+                <h3>Ручне введення LaTeX</h3>
+                <p>Введіть або відредагуйте формулу вручну. Миттєвий перегляд результату перед збереженням.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3>Копіювання у Word</h3>
+                <p>Скопіюйте формулу в буфер обміну та вставте у Word через Ctrl+V як нативну формулу.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <h3>Збереження у .docx</h3>
+                <p>Збережіть одну або кілька формул у Word-файл. Підтримується пакетний режим.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3>Двомовний інтерфейс</h3>
+                <p>Українська та англійська мови. Перемикання одним кліком у верхньому правому куті.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how-it-works" class="section section-alt">
+    <div class="container">
+        <h2 class="section-title">
+            <span class="comment">// </span>Як це працює
+        </h2>
+        <div class="pipeline">
+            <div class="pipeline-step">
+                <div class="step-number">01</div>
+                <div class="step-content">
+                    <h3>Зображення</h3>
+                    <p>Завантажте фото з формулою або вставте скріншот з буфера обміну</p>
+                </div>
+            </div>
+            <div class="pipeline-arrow">→</div>
+            <div class="pipeline-step">
+                <div class="step-number">02</div>
+                <div class="step-content">
+                    <h3>LaTeX (OCR)</h3>
+                    <p>Нейромережа <code>pix2tex</code> розпізнає формулу та перетворює на LaTeX-код</p>
+                </div>
+            </div>
+            <div class="pipeline-arrow">→</div>
+            <div class="pipeline-step">
+                <div class="step-number">03</div>
+                <div class="step-content">
+                    <h3>MathML → OMML</h3>
+                    <p><code>latex2mathml</code> + Microsoft XSLT трансформація у Office Math Markup</p>
+                </div>
+            </div>
+            <div class="pipeline-arrow">→</div>
+            <div class="pipeline-step">
+                <div class="step-number">04</div>
+                <div class="step-content">
+                    <h3>Word документ</h3>
+                    <p><code>python-docx</code> вставляє OMML як нативну формулу Word</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code block illustration -->
+        <div class="code-block">
+            <div class="code-header">
+                <span class="code-dot red"></span>
+                <span class="code-dot yellow"></span>
+                <span class="code-dot green"></span>
+                <span class="code-title">pipeline.py</span>
+            </div>
+            <pre><code><span class="code-comment"># Конвеєр перетворення формули</span>
+<span class="code-keyword">from</span> pix2tex <span class="code-keyword">import</span> LatexOCR
+<span class="code-keyword">import</span> latex2mathml.converter
+
+image  = load_image(<span class="code-string">"formula.png"</span>)
+latex  = LatexOCR()(image)          <span class="code-comment"># "\\frac{a}{b}"</span>
+mathml = latex2mathml.converter.convert(latex)
+omml   = xslt_transform(mathml)    <span class="code-comment"># MML2OMML.XSL</span>
+doc    = insert_to_word(omml)       <span class="code-comment"># native equation!</span></code></pre>
+        </div>
+    </div>
+</section>
+
+<!-- ===== USAGE ===== -->
+<section id="usage" class="section">
+    <div class="container">
+        <h2 class="section-title">
+            <span class="comment">// </span>Використання
+        </h2>
+        <div class="usage-tabs">
+            <div class="usage-tab active" data-tab="photo">Розпізнати з фото</div>
+            <div class="usage-tab" data-tab="latex">Ввести LaTeX</div>
+        </div>
+        <div class="usage-content active" id="tab-photo">
+            <ol class="usage-steps">
+                <li>
+                    <span class="step-mark">$</span>
+                    Натисніть <strong>«Відкрити фото»</strong> або <strong>«Вставити з буфера»</strong> (для скріншотів)
+                </li>
+                <li>
+                    <span class="step-mark">$</span>
+                    Виділіть мишкою <strong>одну формулу</strong> на зображенні
+                </li>
+                <li>
+                    <span class="step-mark">$</span>
+                    Натисніть <strong>«Розпізнати»</strong> — програма поверне LaTeX-код
+                </li>
+                <li>
+                    <span class="step-mark">$</span>
+                    Перевірте та відредагуйте LaTeX у текстовому полі
+                </li>
+                <li>
+                    <span class="step-mark">$</span>
+                    <strong>«Перевірити»</strong> — побачите прев&#39;ю формули
+                </li>
+                <li>
+                    <span class="step-mark">$</span>
+                    <strong>«Зберегти у Word»</strong> або <strong>«Копіювати формулу»</strong> (Ctrl+V у Word)
+                </li>
+            </ol>
+        </div>
+        <div class="usage-content" id="tab-latex">
+            <ol class="usage-steps">
+                <li>
+                    <span class="step-mark">$</span>
+                    Введіть LaTeX-формулу вручну в текстове поле
+                </li>
+                <li>
+                    <span class="step-mark">$</span>
+                    Натисніть <strong>«Перевірити»</strong> для перегляду
+                </li>
+                <li>
+                    <span class="step-mark">$</span>
+                    <strong>«Зберегти у Word»</strong> або <strong>«Копіювати формулу»</strong>
+                </li>
+                <li>
+                    <span class="step-mark">$</span>
+                    <strong>Пакетний режим:</strong> додайте кілька формул кнопкою «До списку», потім збережіть усі разом
+                </li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ===== REQUIREMENTS ===== -->
+<section class="section section-alt">
+    <div class="container">
+        <h2 class="section-title">
+            <span class="comment">// </span>Вимоги
+        </h2>
+        <div class="requirements-grid">
+            <div class="req-card">
+                <div class="req-icon">🖥️</div>
+                <h3>Windows</h3>
+                <p>Портативна .exe версія — встановлення Python не потрібне</p>
+            </div>
+            <div class="req-card">
+                <div class="req-icon">📎</div>
+                <h3>Microsoft Office</h3>
+                <p>Потрібен файл <code>MML2OMML.XSL</code>, який постачається з Office</p>
+            </div>
+            <div class="req-card">
+                <div class="req-icon">🌍</div>
+                <h3>Інтернет</h3>
+                <p>Тільки для першого запуску — завантажується модель OCR (~500 МБ)</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== DOWNLOAD ===== -->
+<section id="download" class="section section-download">
+    <div class="container">
+        <h2 class="section-title">
+            <span class="comment">// </span>Завантажити
+        </h2>
+        <div class="download-box">
+            <div class="download-info">
+                <h3>FormulyWord.exe</h3>
+                <p>Портативна версія — просто запустіть .exe файл. Встановлення не потрібне.</p>
+                <div class="download-meta">
+                    <span><code>Windows 10/11</code></span>
+                    <span><code>Portable</code></span>
+                    <span><code>Open Source</code></span>
+                </div>
+            </div>
+            <a href="https://drive.google.com/drive/folders/1coqkFN6xLW1JOtSJV9wmMclEwwaBSRx2?usp=sharing"
+               class="btn btn-primary btn-lg" target="_blank" rel="noopener noreferrer">
+                <span class="btn-icon">↓</span> Завантажити з Google Drive
+            </a>
+        </div>
+
+        <!-- Video placeholder -->
+        <div class="video-placeholder" id="video">
+            <div class="video-inner">
+                <div class="play-icon">▶</div>
+                <p>Тут буде відео-демонстрація роботи програми</p>
+                <span class="video-hint"><!-- Замініть цей блок на iframe з YouTube --></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="container footer-content">
+        <div class="footer-logo">
+            <span class="logo-bracket">{</span>
+            <span class="logo-text">FormulyWord</span>
+            <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-text">
+            Open-source проєкт &bull; Створено з ❤️ для студентів та науковців
+        </p>
+        <p class="footer-copy">&copy; 2025-2026 FormulyWord</p>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
