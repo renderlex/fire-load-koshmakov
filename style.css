@@ -679,29 +679,34 @@ img {
     color: var(--text-code);
 }
 
-/* Video placeholder */
-.video-placeholder {
-    background: var(--bg-card);
-    border: 2px dashed var(--border);
-    border-radius: var(--radius-lg);
-    padding: 80px 40px;
+/* Video section */
+.video-section {
     text-align: center;
+    margin-top: 48px;
 }
 
-.video-inner {
-    color: var(--text-muted);
+.video-title {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: var(--text-primary);
 }
 
-.play-icon {
-    font-size: 3rem;
-    margin-bottom: 16px;
-    color: var(--accent);
-    opacity: 0.5;
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-.video-placeholder p {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 /* ===== DONATE ===== */
@@ -839,6 +844,18 @@ img {
     box-shadow: 0 6px 20px rgba(0, 112, 186, 0.3);
 }
 
+.btn-kofi {
+    background: #ff5e5b;
+    color: #fff;
+}
+
+.btn-kofi:hover {
+    background: #e04e4b;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 94, 91, 0.3);
+}
+
 .donate-thanks {
     text-align: center;
     color: var(--text-muted);
@@ -866,9 +883,66 @@ img {
     margin-bottom: 8px;
 }
 
+.footer-license {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
 .footer-copy {
     color: var(--text-muted);
     font-size: 0.8rem;
+}
+
+/* ===== CONTACTS ===== */
+.contacts-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px 36px;
+    transition: border-color 0.3s, transform 0.3s;
+}
+
+.contact-item:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.contact-icon {
+    font-size: 2rem;
+}
+
+.contact-item h3 {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.contact-item a {
+    color: var(--accent);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+}
+
+.contact-item a:hover {
+    text-decoration: underline;
 }
 
 /* ===== SCROLLBAR ===== */

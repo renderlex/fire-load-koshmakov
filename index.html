@@ -262,10 +262,10 @@ doc    = insert_to_word(omml)       <span class="code-comment"># native equation
             </a>
         </div>
 
-        <div class="video-placeholder" id="video">
-            <div class="video-inner">
-                <div class="play-icon">▶</div>
-                <p data-uk="Тут буде відео-демонстрація роботи програми" data-en="Video demonstration will be here">Тут буде відео-демонстрація роботи програми</p>
+        <div class="video-section" id="video">
+            <h3 class="video-title" data-uk="📹 Відео-демонстрація" data-en="📹 Video Demo">📹 Відео-демонстрація</h3>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/SjZyzJPjw-Q" title="FormulyWord Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
     </div>
@@ -281,25 +281,33 @@ doc    = insert_to_word(omml)       <span class="code-comment"># native equation
             FormulyWord — безкоштовний та open-source. Якщо програма вам корисна, ви можете підтримати розробку:
         </p>
         <div class="donate-grid">
-            <div class="donate-card">
+            <div class="donate-card donate-card-featured">
+                <div class="donate-featured-label" data-uk="Рекомендовано" data-en="Recommended">Рекомендовано</div>
                 <div class="donate-icon">☕</div>
                 <h3>Buy Me a Coffee</h3>
                 <p data-uk="Міжнародні платежі — Visa, Mastercard, Apple Pay, Google Pay" data-en="International payments — Visa, Mastercard, Apple Pay, Google Pay">Міжнародні платежі — Visa, Mastercard, Apple Pay, Google Pay</p>
                 <div class="donate-badge" data-uk="Для всіх країн" data-en="All countries">Для всіх країн</div>
-                <!-- TODO: Замініть YOUR_USERNAME на ваш buymeacoffee.com username -->
-                <a href="https://buymeacoffee.com/YOUR_USERNAME" class="btn btn-donate btn-coffee" target="_blank" rel="noopener noreferrer">
+                <a href="https://buymeacoffee.com/renderlexf" class="btn btn-donate btn-coffee" target="_blank" rel="noopener noreferrer">
                     <span>☕</span>
                     <span data-uk="Купити каву" data-en="Buy me a coffee">Купити каву</span>
                 </a>
             </div>
-            <div class="donate-card donate-card-featured">
-                <div class="donate-featured-label" data-uk="Рекомендовано" data-en="Recommended">Рекомендовано</div>
+            <div class="donate-card">
+                <div class="donate-icon">🎁</div>
+                <h3>Ko-fi</h3>
+                <p data-uk="Альтернатива без комісії — підтримайте одноразово або щомісяця." data-en="Commission-free alternative — support one-time or monthly.">Альтернатива без комісії — підтримайте одноразово або щомісяця.</p>
+                <div class="donate-badge" data-uk="0% комісії" data-en="0% fees">0% комісії</div>
+                <a href="https://ko-fi.com/renderlexf" class="btn btn-donate btn-kofi" target="_blank" rel="noopener noreferrer">
+                    <span>🎁</span>
+                    <span data-uk="Підтримати на Ko-fi" data-en="Support on Ko-fi">Підтримати на Ko-fi</span>
+                </a>
+            </div>
+            <div class="donate-card">
                 <div class="donate-icon">🏦</div>
                 <h3 data-uk="Монобанка" data-en="Monobank Jar">Монобанка</h3>
                 <p data-uk="Для українських карток — 0% комісії. Моментальний переказ." data-en="For Ukrainian cards — 0% fees. Instant transfer via monobank.">Для українських карток — 0% комісії. Моментальний переказ.</p>
                 <div class="donate-badge" data-uk="0% комісії 🇺🇦" data-en="0% fees 🇺🇦">0% комісії 🇺🇦</div>
-                <!-- TODO: Замініть YOUR_JAR_ID на ID вашої монобанки -->
-                <a href="https://send.monobank.ua/jar/YOUR_JAR_ID" class="btn btn-donate btn-mono" target="_blank" rel="noopener noreferrer">
+                <a href="https://send.monobank.ua/jar/9VqNoYGXBz" class="btn btn-donate btn-mono" target="_blank" rel="noopener noreferrer">
                     <span>💳</span>
                     <span data-uk="Задонатити" data-en="Donate">Задонатити</span>
                 </a>
@@ -309,16 +317,40 @@ doc    = insert_to_word(omml)       <span class="code-comment"># native equation
                 <h3>PayPal</h3>
                 <p data-uk="Класичний спосіб — PayPal-переказ на будь-яку суму." data-en="Classic method — PayPal transfer of any amount.">Класичний спосіб — PayPal-переказ на будь-яку суму.</p>
                 <div class="donate-badge" data-uk="Для всіх країн" data-en="All countries">Для всіх країн</div>
-                <!-- TODO: Замініть YOUR_PAYPAL на ваш PayPal.me username -->
-                <a href="https://paypal.me/YOUR_PAYPAL" class="btn btn-donate btn-paypal" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.paypal.com/donate/?hosted_button_id=L8VD7FUSKXBBC" class="btn btn-donate btn-paypal" target="_blank" rel="noopener noreferrer">
                     <span>💸</span>
                     <span data-uk="PayPal переказ" data-en="PayPal transfer">PayPal переказ</span>
                 </a>
             </div>
         </div>
-        <p class="donate-thanks" data-uk="Дякуємо за підтримку! Кожен донат допомагає покращувати програму ❤️" data-en="Thank you for your support! Every donation helps improve the program ❤️">
-            Дякуємо за підтримку! Кожен донат допомагає покращувати програму ❤️
+        <p class="donate-thanks" data-uk="Ми раді будь-якій підтримці наших проєктів! Дякуємо — кожен донат допомагає розвивати програму ❤️" data-en="We appreciate any support for our projects! Thank you — every donation helps improve the program ❤️">
+            Ми раді будь-якій підтримці наших проєктів! Дякуємо — кожен донат допомагає розвивати програму ❤️
         </p>
+    </div>
+</section>
+
+<!-- ===== CONTACTS ===== -->
+<section id="contacts" class="section">
+    <div class="container">
+        <h2 class="section-title">
+            <span class="comment">// </span><span data-uk="Контакти" data-en="Contacts">Контакти</span>
+        </h2>
+        <div class="contacts-box">
+            <div class="contact-item">
+                <span class="contact-icon">📧</span>
+                <div>
+                    <h3>Email</h3>
+                    <a href="mailto:renderlex@gmail.com">renderlex@gmail.com</a>
+                </div>
+            </div>
+            <div class="contact-item">
+                <span class="contact-icon">💻</span>
+                <div>
+                    <h3>GitHub</h3>
+                    <a href="https://github.com/renderlex" target="_blank" rel="noopener noreferrer">github.com/renderlex</a>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -332,6 +364,9 @@ doc    = insert_to_word(omml)       <span class="code-comment"># native equation
         </div>
         <p class="footer-text" data-uk="Open-source проєкт &bull; Створено з ❤️ для студентів та науковців" data-en="Open-source project &bull; Made with ❤️ for students and researchers">
             Open-source проєкт &bull; Створено з ❤️ для студентів та науковців
+        </p>
+        <p class="footer-license" data-uk="Ліцензія MIT — вільне використання, модифікація та розповсюдження" data-en="MIT License — free to use, modify, and distribute">
+            Ліцензія MIT — вільне використання, модифікація та розповсюдження
         </p>
         <p class="footer-copy">&copy; 2025-2026 FormulyWord</p>
     </div>
