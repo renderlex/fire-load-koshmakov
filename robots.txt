@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://renderlex.github.io/formulyword/sitemap.xml
