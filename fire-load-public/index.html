@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireLoad DB - Fire Load Database by Koshmakov</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --card-bg: #252526;
+            --text-color: #e0e0e0;
+            --accent-color: #00ff00;
+            --border-color: #404040;
+            --row-hover: #2d2d30;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .lang-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 0;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .lang-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        .lang-btn:hover {
+            border-color: var(--accent-color);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            position: relative;
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            background: rgba(30,30,30,0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            margin-top: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            color: #888888;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 0;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-family: 'Courier New', monospace;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .search-box {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 0;
+            border: 2px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+        }
+
+        input::placeholder {
+            color: #666666;
+        }
+
+        .table-container {
+            background-color: var(--card-bg);
+            border-radius: 0;
+            overflow-x: auto;
+            border: 2px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 1000px;
+            font-family: 'Courier New', monospace;
+        }
+
+        th {
+            background-color: #1a1a1a;
+            padding: 15px;
+            font-size: 13px;
+            color: #888888;
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(64,64,64,0.5);
+            font-size: 14px;
+        }
+
+        tr:hover { 
+            background-color: var(--row-hover);
+        }
+
+        .category-tag {
+            padding: 8px 12px;
+            border-radius: 0;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+            border: 1px solid;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .cat-Buildings { background-color: rgba(0,255,0,0.15); color: #00ff00; border-color: #00aa00; }
+        .cat-Chemicals { background-color: rgba(255,0,0,0.15); color: #ff6b6b; border-color: #cc0000; }
+        .cat-Industrial { background-color: rgba(255,170,0,0.15); color: #ffaa00; border-color: #cc8800; }
+        .cat-Materials { background-color: rgba(0,200,200,0.15); color: #00dddd; border-color: #00aaaa; }
+
+        .grid-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 0;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 0 15px rgba(0,255,0,0.1);
+        }
+
+        .card h3 { 
+            color: var(--text-color); 
+            margin-top: 0; 
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+        
+        .val-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 8px 0; 
+            border-bottom: 1px dashed rgba(64,64,64,0.5); 
+            padding-bottom: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .val-label { color: #888888; }
+        .val-value { font-weight: bold; color: var(--text-color); }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #888888;
+            font-size: 16px;
+        }
+
+        footer { 
+            margin: 40px 0; 
+            color: #888888; 
+            font-size: 12px; 
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .lang-switcher {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+            }
+
+            h1 { font-size: 1.8em; }
+            
+            .tabs {
+                flex-direction: column;
+            }
+        }
+
+        .donation-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 0;
+            background: rgba(30,30,30,0.5);
+            text-align: center;
+        }
+
+        .donation-title {
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .donation-buttons, .profile-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .donate-btn, .profile-btn {
+            padding: 10px 18px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+
+        .donate-btn:hover, .profile-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="uk">🇺🇦 Українська</button>
+        <button class="lang-btn" data-lang="en">🇬🇧 English</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>FireLoad DB</h1>
+            <p class="subtitle" id="subtitle">Довідник характеристик пожежної навантаги за Ю.А. Кошмаровим</p>
+        </header>
+
+        <div class="tabs" id="tabsContainer">
+            <button class="tab-btn active" onclick="openTab('substances')" data-substances>База речовин (67)</button>
+            <button class="tab-btn" onclick="openTab('thresholds')" data-thresholds>Нормативи (ПДЗ)</button>
+            <button class="tab-btn" onclick="openTab('coefficients')" data-coefficients>Коефіцієнти</button>
+            <button class="tab-btn" onclick="openTab('manual')" data-manual>Manual</button>
+        </div>
+
+        <!-- ВКЛАДКА РЕЧОВИН -->
+        <div id="substances" class="tab-content active">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Пошук матеріалу...">
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr id="headerRow">
+                            <th data-key="name">Назва</th>
+                            <th data-key="category">Категорія</th>
+                            <th>Q_н (кДж)</th>
+                            <th>v_п / ρ</th>
+                            <th>ψ_уд</th>
+                            <th>D_m</th>
+                            <th>L_O2</th>
+                            <th>L_CO2</th>
+                            <th>L_CO</th>
+                            <th>L_HCl</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable">
+                        <tr class="no-results"><td colspan="10" id="loadingText">Завантаження...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ВКЛАДКА НОРМАТИВІВ -->
+        <div id="thresholds" class="tab-content">
+            <div class="grid-info" id="thresholdsContent">
+                <div class="card">
+                    <h3 id="pdz-title">Гранично допустимі значення (ПДЗ)</h3>
+                    <div class="val-row"><span class="val-label" data-key="temp">Температура середовища</span><span class="val-value">70 °C</span></div>
+                    <div class="val-row"><span class="val-label" data-key="visibility">Видимість у диму (l_вид)</span><span class="val-value">2.38 / μ м</span></div>
+                    <div class="val-row"><span class="val-label" data-key="o2">Парціальна щільність O2</span><span class="val-value">0.226 кг/м³</span></div>
+                    <div class="val-row"><span class="val-label" data-key="co">Оксид вуглецю (CO)</span><span class="val-value">1.16 × 10⁻³ кг/м³</span></div>
+                    <div class="val-row"><span class="val-label" data-key="co2">Діоксид вуглецю (CO2)</span><span class="val-value">0.11 кг/м³</span></div>
+                    <div class="val-row"><span class="val-label" data-key="hcl">Хлористий водень (HCl)</span><span class="val-value">23 × 10⁻⁶ кг/м³</span></div>
+                </div>
+                <div class="card">
+                    <h3 id="temps-title">Критичні температури конструкцій</h3>
+                    <div class="val-row"><span class="val-label" data-key="reinf">Залізобетон (арматура)</span><span class="val-value">400 - 450 °C</span></div>
+                    <div class="val-row"><span class="val-label" data-key="glass">Скління (руйнування)</span><span class="val-value">300 - 350 °C</span></div>
+                    <div class="val-row"><span class="val-label" data-key="wood">Початок піролізу деревини</span><span class="val-value">~200 °C</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВКЛАДКА КОЕФІЦІЄНТІВ -->
+        <div id="coefficients" class="tab-content">
+            <div class="grid-info" id="coefficientsContent">
+                <div class="card">
+                    <h3 id="bashkirtsev-title">Константи Башкирцева</h3>
+                    <div class="val-row"><span class="val-label" data-key="const-a">Коефіцієнт 'a'</span><span class="val-value">0.8 K⁻¹</span></div>
+                    <div class="val-row"><span class="val-label" data-key="const-a1">Коефіцієнт 'α1'</span><span class="val-value">4.07 Вт/м²</span></div>
+                    <div class="val-row"><span class="val-label" data-key="const-a2">Коефіцієнт 'α2'</span><span class="val-value">11.6 Вт/м²</span></div>
+                    <div class="val-row"><span class="val-label" data-key="const-n">Показник 'n'</span><span class="val-value">0.0023 K⁻¹</span></div>
+                </div>
+                <div class="card">
+                    <h3 id="params-title">Параметри вигоряння (A та n)</h3>
+                    <div class="val-row"><span class="val-label" data-key="param-circle">Кругове поширення (ТГМ)</span><span class="val-value">n=3, A=1.05 * ψ_уд * v_л²</span></div>
+                    <div class="val-row"><span class="val-label" data-key="param-line">Лінійне поширення (ТГМ)</span><span class="val-value">n=2, A=0.5 * b_ф * ψ_уд * v_л</span></div>
+                    <div class="val-row"><span class="val-label" data-key="param-non">Нестаціонарне (Рідини)</span><span class="val-value">n=1.5, A=2/3 * F_г * ψ_уд / √τ_ст</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВКЛАДКА МАНУАЛУ -->
+        <div id="manual" class="tab-content">
+            <div class="grid-info" id="manualContent">
+                <div class="card">
+                    <h3>[ENGLISH] Parameters Guide</h3>
+                    <div class="val-row"><span class="val-label">Q_н (Heat of combustion)</span><span class="val-value">kJ/kg</span></div>
+                    <div class="val-row"><span class="val-label">v_п (Flame spread velocity)</span><span class="val-value">m/(m²·s)</span></div>
+                    <div class="val-row"><span class="val-label">ψ_уд (Smoke capacity)</span><span class="val-value">m²/kg</span></div>
+                    <div class="val-row"><span class="val-label">D_m (Smoke density)</span><span class="val-value">m²/s</span></div>
+                    <div class="val-row"><span class="val-label">L_O₂ (Oxygen consumption)</span><span class="val-value">kg/kg</span></div>
+                    <div class="val-row"><span class="val-label">L_CO₂ (CO₂ emission)</span><span class="val-value">kg/kg</span></div>
+                    <div class="val-row"><span class="val-label">L_CO (CO emission)</span><span class="val-value">kg/kg</span></div>
+                    <div class="val-row"><span class="val-label">L_HCl (HCl emission)</span><span class="val-value">kg/kg</span></div>
+                </div>
+                <div class="card">
+                    <h3>[УКРАЇНСЬКА] Параметри бази</h3>
+                    <div class="val-row"><span class="val-label">Q_н (Теплота згоряння)</span><span class="val-value">кДж/кг</span></div>
+                    <div class="val-row"><span class="val-label">v_п (Швидкість поширення полум'я)</span><span class="val-value">м/(м²·с)</span></div>
+                    <div class="val-row"><span class="val-label">ψ_уд (Димоємність)</span><span class="val-value">м²/кг</span></div>
+                    <div class="val-row"><span class="val-label">D_m (Щільність диму)</span><span class="val-value">м²/с</span></div>
+                    <div class="val-row"><span class="val-label">L_O₂ (Споживання кисню)</span><span class="val-value">кг/кг</span></div>
+                    <div class="val-row"><span class="val-label">L_CO₂ (Викид CO₂)</span><span class="val-value">кг/кг</span></div>
+                    <div class="val-row"><span class="val-label">L_CO (Викид CO)</span><span class="val-value">кг/кг</span></div>
+                    <div class="val-row"><span class="val-label">L_HCl (Викид HCl)</span><span class="val-value">кг/кг</span></div>
+                </div>
+                <div class="card">
+                    <h3>[ENGLISH] How to Use</h3>
+                    <div class="val-row" style="display: block; padding: 10px; border: none;">
+                        <strong>1. Select Language:</strong> Use UK/EN buttons (top-right)<br><br>
+                        <strong>2. Search:</strong> Type substance name in search box to filter results<br><br>
+                        <strong>3. Browse Categories:</strong> Materials are grouped into:<br>
+                        • Buildings • Chemicals • Industrial • Materials<br><br>
+                        <strong>4. View Tabs:</strong><br>
+                        • Base - All 67 substances (Koshmakov reference)<br>
+                        • Thresholds - PLE values<br>
+                        • Coefficients - Bashkirtsev constants<br>
+                        • Manual - This guide
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>[УКРАЇНСЬКА] Як користуватися</h3>
+                    <div class="val-row" style="display: block; padding: 10px; border: none;">
+                        <strong>1. Оберіть мову:</strong> Кнопки UK/EN (верхній правий кут)<br><br>
+                        <strong>2. Пошук:</strong> Введіть назву речовини в пошуковому полі<br><br>
+                        <strong>3. Категорії:</strong> Матеріали розділені на:<br>
+                        • Будівлі • Хімікати • Промислові • Матеріали<br><br>
+                        <strong>4. Вкладки:</strong><br>
+                        • База - Усі 67 речовин (довідник Кошмарова)<br>
+                        • Нормативи - Значення ПДЗ<br>
+                        • Коефіцієнти - Константи Башкирцева<br>
+                        • Manual - Це керівництво
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div id="footerText">
+                База даних сформована на основі посібника Ю.А. Кошмарова "Прогнозування небезпечних факторів пожежі в приміщенні". <br>
+                Всі 67 табличних позицій враховані.
+            </div>
+            <div class="donation-section">
+                <div class="donation-title">--- SUPPORT THE PROJECT ---</div>
+                <div class="donation-buttons">
+                    <a href="https://www.paypal.com/donate/?hosted_button_id=L8VD7FUSKXBBC" target="_blank" class="donate-btn">PAYPAL</a>
+                    <a href="https://buymeacoffee.com/renderlexf" target="_blank" class="donate-btn">BUY ME COFFEE</a>
+                    <a href="https://send.monobank.ua/jar/9VqNoYGXBz" target="_blank" class="donate-btn">MONOBANK</a>
+                    <a href="https://ko-fi.com/renderlex" target="_blank" class="donate-btn">KO-FI</a>
+                </div>
+                <div class="donation-title">--- PROFILES ---</div>
+                <div class="profile-links">
+                    <a href="https://www.facebook.com/profile.php?id=61556318017646" target="_blank" class="profile-btn">FACEBOOK</a>
+                    <a href="https://orcid.org/0000-0002-1003-8876" target="_blank" class="profile-btn">ORCID</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const translations = {
+            uk: {
+                subtitle: 'Довідник характеристик пожежної навантаги за Ю.А. Кошмаровим',
+                substances_tab: 'База речовин (67)',
+                thresholds_tab: 'Нормативи (ПДЗ)',
+                coefficients_tab: 'Коефіцієнти',
+                search_placeholder: 'Пошук матеріалу...',
+                loading: 'Завантаження...',
+                noResults: 'Результатів не знайдено',
+                headers: { name: 'Назва', category: 'Категорія' },
+                categories: {
+                    Buildings: 'Будівлі',
+                    Chemicals: 'Хімікати',
+                    Industrial: 'Промисловість',
+                    Materials: 'Матеріали'
+                },
+                footerText: 'База даних сформована на основі посібника Ю.А. Кошмарова "Прогнозування небезпечних факторів пожежі в приміщенні". Всі 67 табличних позицій враховані.'
+            },
+            en: {
+                subtitle: 'Fire Load Database - Reference by Yu.A. Koshmakov',
+                substances_tab: 'Materials Database (67)',
+                thresholds_tab: 'Standards (PDL)',
+                coefficients_tab: 'Coefficients',
+                search_placeholder: 'Search materials...',
+                loading: 'Loading...',
+                noResults: 'No results found',
+                headers: { name: 'Name', category: 'Category' },
+                categories: {
+                    Buildings: 'Buildings',
+                    Chemicals: 'Chemicals',
+                    Industrial: 'Industrial',
+                    Materials: 'Materials'
+                },
+                footerText: 'Database based on Yu.A. Koshmakov\'s "Prediction of dangerous fire factors in premises". All 67 entries included.'
+            }
+        };
+
+        let currentLang = 'uk';
+        let allData = [];
+        const searchInput = document.getElementById('searchInput');
+        const dataTable = document.getElementById('dataTable');
+        const langButtons = document.querySelectorAll('.lang-btn');
+
+        langButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentLang = btn.dataset.lang;
+                langButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                updateLanguage();
+                renderTable(allData);
+            });
+        });
+
+        function updateLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('searchInput').placeholder = t.search_placeholder;
+            document.getElementById('footerText').innerHTML = t.footerText;
+            
+            const tabBtns = document.querySelectorAll('.tabs button');
+            tabBtns[0].textContent = t.substances_tab;
+            tabBtns[1].textContent = t.thresholds_tab;
+            tabBtns[2].textContent = t.coefficients_tab;
+
+            document.querySelectorAll('#headerRow th').forEach((th, idx) => {
+                if (idx === 0) th.textContent = t.headers.name;
+                if (idx === 1) th.textContent = t.headers.category;
+            });
+        }
+
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        async function init() {
+            try {
+                const response = await fetch('data.json');
+                allData = await response.json();
+                renderTable(allData);
+            } catch (error) {
+                console.error('Error:', error);
+                dataTable.innerHTML = '<tr class="no-results"><td colspan="10" style="color:red; text-align:center;">Помилка завантаження даних</td></tr>';
+            }
+        }
+
+        function getDisplayName(billingualName, language) {
+            if (!billingualName) return '';
+            const parts = billingualName.split(' | ');
+            return language === 'en' ? (parts[0] || billingualName) : (parts[1] || billingualName);
+        }
+
+        function renderTable(data) {
+            const t = translations[currentLang];
+            
+            if (data.length === 0) {
+                dataTable.innerHTML = `<tr class="no-results"><td colspan="10">${t.noResults}</td></tr>`;
+                return;
+            }
+
+            dataTable.innerHTML = data.map(item => {
+                const catName = currentLang === 'uk' ? 
+                    (t.categories[item.category] || item.category) : 
+                    item.category;
+                
+                return `
+                    <tr>
+                        <td><strong>${getDisplayName(item.name, currentLang)}</strong></td>
+                        <td><span class="category-tag cat-${item.category}">${catName}</span></td>
+                        <td>${parseFloat(item.q_low).toFixed(0)}</td>
+                        <td>${parseFloat(item.v_spread).toFixed(4)}</td>
+                        <td>${parseFloat(item.psi_ud).toFixed(4)}</td>
+                        <td>${parseFloat(item.smoke_capacity).toFixed(1)}</td>
+                        <td>${parseFloat(item.o2_consumption).toFixed(3)}</td>
+                        <td>${parseFloat(item.co2_emission).toFixed(3)}</td>
+                        <td>${parseFloat(item.co_emission).toFixed(4)}</td>
+                        <td>${parseFloat(item.hcl_emission).toFixed(4)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allData.filter(item => 
+                item.name.toLowerCase().includes(term) || 
+                item.category.toLowerCase().includes(term)
+            );
+            renderTable(filtered);
+        });
+
+        init();
+    </script>
+</body>
+</html>

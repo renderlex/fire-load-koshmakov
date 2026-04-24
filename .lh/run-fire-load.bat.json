@@ -1,0 +1,18 @@
+{
+    "sourceFile": "run-fire-load.bat",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1777063964101,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1777063964101,
+            "name": "Commit-0",
+            "content": "@echo off\r\nREM ============================================\r\nREM Fire Load Database - Локальний запуск\r\nREM ============================================\r\nREM Сайт: База даних пожежних навантажень\r\nREM Опис: На основі Кошмарова, на Express.js + SQLite3\r\nREM Порт: 3000\r\nREM Фронтенд: http://localhost:3000\r\nREM ============================================\r\n\r\ncd /d \"%~dp0fire-load-app\"\r\n\r\necho.\r\necho [FIRE-LOAD] Встановлення залежностей...\r\ncall npm install\r\n\r\necho.\r\necho [FIRE-LOAD] Ініціалізація бази даних...\r\ncall npm run seed\r\n\r\necho.\r\necho [FIRE-LOAD] Запуск сервера на порту 3000...\r\necho [FIRE-LOAD] Перейдіть на http://localhost:3000 у браузер\r\necho.\r\ncall npm start\r\n\r\npause\r\n"
+        }
+    ]
+}

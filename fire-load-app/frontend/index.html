@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireLoad DB - База даних пожежних навантажень</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --card-bg: #252526;
+            --text-color: #e0e0e0;
+            --accent-color: #00ff00;
+            --border-color: #404040;
+            --row-hover: #2d2d30;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .lang-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 0;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .lang-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        .lang-btn:hover {
+            border-color: var(--accent-color);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            position: relative;
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            background: rgba(30,30,30,0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            margin-top: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            color: #888888;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 0;
+            border: 2px solid var(--border-color);
+            background-color: #0a0a0a;
+            color: var(--accent-color);
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px var(--accent-color);
+            box-shadow: inset 0 0 10px rgba(0,255,0,0.1), 0 0 10px rgba(0,255,0,0.2);
+        }
+
+        .search-box input::placeholder {
+            color: #00881100;
+        }
+
+        .stats {
+            padding: 12px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 0;
+            font-weight: bold;
+            color: var(--accent-color);
+            white-space: nowrap;
+            text-shadow: 0 0 5px var(--accent-color);
+            box-shadow: 0 0 10px rgba(0,255,0,0.2);
+        }
+
+        .table-container {
+            background-color: var(--card-bg);
+            border-radius: 0;
+            overflow-x: auto;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 0 25px rgba(0,255,0,0.15), inset 0 0 15px rgba(0,255,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 1200px;
+            font-family: 'Courier New', monospace;
+        }
+
+        th {
+            background-color: #1a1a1a;
+            padding: 15px;
+            font-size: 13px;
+            color: #888888;
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(64,64,64,0.5);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: var(--row-hover);
+
+        .category-tag {
+            padding: 8px 12px;
+            border-radius: 0;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: inline-block;
+            border: 1px solid;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .cat-Buildings { background-color: rgba(0,255,0,0.15); color: #00ff00; border-color: #00aa00; }
+        .cat-Chemicals { background-color: rgba(255,0,0,0.15); color: #ff6b6b; border-color: #cc0000; }
+        .cat-Industrial { background-color: rgba(255,170,0,0.15); color: #ffaa00; border-color: #cc8800; }
+        .cat-Materials { background-color: rgba(0,200,200,0.15); color: #00dddd; border-color: #00aaaa; }
+
+        footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #008800;
+            text-align: center;
+            max-width: 800px;
+            text-shadow: 0 0 5px #008800;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #888888;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .lang-switcher {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+            }
+
+            h1 { font-size: 1.8em; }
+            
+            .controls {
+                flex-direction: column;
+            }
+
+            .stats {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        .donation-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 0;
+            background: rgba(30,30,30,0.5);
+            text-align: center;
+        }
+
+        .donation-title {
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .donation-buttons, .profile-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .donate-btn, .profile-btn {
+            padding: 10px 18px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+
+        .donate-btn:hover, .profile-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="uk">🇺🇦 Українська</button>
+        <button class="lang-btn" data-lang="en">🇬🇧 English</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>FireLoad DB</h1>
+            <p class="subtitle" id="subtitle">Довідник характеристик пожежної навантаги за Ю.А. Кошмаровим</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Пошук...">
+            </div>
+            <div class="stats" id="statsText">Всього: <span id="totalCount">67</span></div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr id="headerRow">
+                        <th data-key="name">Назва</th>
+                        <th data-key="category">Категорія</th>
+                        <th data-key="q_low">Q_н (кДж/кг)</th>
+                        <th data-key="v_spread">v_п (м/с)</th>
+                        <th data-key="psi_ud">ψ_уд (кг/м²с)</th>
+                        <th data-key="smoke_capacity">D_m (Нп·м²/кг)</th>
+                        <th data-key="o2_consumption">L_O2 (кг/кг)</th>
+                        <th data-key="co2_emission">L_CO2 (кг/кг)</th>
+                        <th data-key="co_emission">L_CO (кг/кг)</th>
+                        <th data-key="hcl_emission">L_HCl (кг/кг)</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTable">
+                    <tr class="no-results"><td colspan="10" id="loadingText">Завантаження...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            <div>
+                <p id="footerText">
+                    Дані базуються на навчальному посібнику "Прогнозування небезпечних факторів пожежі" за Ю.А. Кошмаровим (67 елементів)
+                </p>
+            </div>
+            <div class="donation-section">
+                <div class="donation-title">--- SUPPORT THE PROJECT ---</div>
+                <div class="donation-buttons">
+                    <a href="https://www.paypal.com/donate/?hosted_button_id=L8VD7FUSKXBBC" target="_blank" class="donate-btn">PAYPAL</a>
+                    <a href="https://buymeacoffee.com/renderlexf" target="_blank" class="donate-btn">BUY ME COFFEE</a>
+                    <a href="https://send.monobank.ua/jar/9VqNoYGXBz" target="_blank" class="donate-btn">MONOBANK</a>
+                    <a href="https://ko-fi.com/renderlex" target="_blank" class="donate-btn">KO-FI</a>
+                </div>
+                <div class="donation-title">--- PROFILES ---</div>
+                <div class="profile-links">
+                    <a href="https://www.facebook.com/profile.php?id=61556318017646" target="_blank" class="profile-btn">FACEBOOK</a>
+                    <a href="https://orcid.org/0000-0002-1003-8876" target="_blank" class="profile-btn">ORCID</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const translations = {
+            uk: {
+                subtitle: 'Довідник характеристик пожежної навантаги за Ю.А. Кошмаровим',
+                searchPlaceholder: 'Пошук...',
+                statsText: 'Всього: ',
+                footerText: 'Дані базуються на навчальному посібнику "Прогнозування небезпечних факторів пожежі" за Ю.А. Кошмаровим (67 елементів)',
+                loadingText: 'Завантаження...',
+                noResults: 'Результатів не знайдено',
+                headers: {
+                    name: 'Назва',
+                    category: 'Категорія',
+                    q_low: 'Q_н (кДж/кг)',
+                    v_spread: 'v_п (м/с)',
+                    psi_ud: 'ψ_уд (кг/м²с)',
+                    smoke_capacity: 'D_m (Нп·м²/кг)',
+                    o2_consumption: 'L_O2 (кг/кг)',
+                    co2_emission: 'L_CO2 (кг/кг)',
+                    co_emission: 'L_CO (кг/кг)',
+                    hcl_emission: 'L_HCl (кг/кг)'
+                },
+                categories: {
+                    Buildings: 'Будівлі',
+                    Chemicals: 'Хімікати',
+                    Industrial: 'Промисловість',
+                    Materials: 'Матеріали'
+                }
+            },
+            en: {
+                subtitle: 'Fire Load Database - Reference by Yu.A. Koshmakov',
+                searchPlaceholder: 'Search...',
+                statsText: 'Total: ',
+                footerText: 'Data based on fire load reference by Yu.A. Koshmakov (67 elements)',
+                loadingText: 'Loading...',
+                noResults: 'No results found',
+                headers: {
+                    name: 'Name',
+                    category: 'Category',
+                    q_low: 'Q_l (kJ/kg)',
+                    v_spread: 'v_s (m/s)',
+                    psi_ud: 'ψ_ud (kg/m²s)',
+                    smoke_capacity: 'D_m (Np·m²/kg)',
+                    o2_consumption: 'L_O2 (kg/kg)',
+                    co2_emission: 'L_CO2 (kg/kg)',
+                    co_emission: 'L_CO (kg/kg)',
+                    hcl_emission: 'L_HCl (kg/kg)'
+                },
+                categories: {
+                    Buildings: 'Buildings',
+                    Chemicals: 'Chemicals',
+                    Industrial: 'Industrial',
+                    Materials: 'Materials'
+                }
+            }
+        };
+
+        let currentLang = 'uk';
+        let allData = [];
+
+        const langButtons = document.querySelectorAll('.lang-btn');
+        const searchInput = document.getElementById('searchInput');
+        const dataTable = document.getElementById('dataTable');
+
+        langButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentLang = btn.dataset.lang;
+                langButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                updateLanguage();
+                renderTable(allData);
+            });
+        });
+
+        function updateLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            document.getElementById('statsText').innerHTML = `${t.statsText}<span id="totalCount">67</span>`;
+            document.getElementById('footerText').textContent = t.footerText;
+            
+            document.querySelectorAll('#headerRow th').forEach(th => {
+                const key = th.dataset.key;
+                th.textContent = t.headers[key];
+            });
+        }
+
+        async function fetchData(query = '') {
+            try {
+                const response = await fetch(`/api/fire-loads?search=${encodeURIComponent(query)}`);
+                allData = await response.json();
+                renderTable(allData);
+            } catch (error) {
+                console.error('Error:', error);
+                dataTable.innerHTML = `<tr class="no-results"><td colspan="10">${translations[currentLang].loadingText}</td></tr>`;
+            }
+        }
+
+        function getDisplayName(billingualName, language) {
+            if (!billingualName) return '';
+            const parts = billingualName.split(' | ');
+            return language === 'en' ? (parts[0] || billingualName) : (parts[1] || billingualName);
+        }
+
+        function renderTable(data) {
+            const t = translations[currentLang];
+            
+            if (data.length === 0) {
+                dataTable.innerHTML = `<tr class="no-results"><td colspan="10">${t.noResults}</td></tr>`;
+                return;
+            }
+
+            dataTable.innerHTML = data.map(item => {
+                const catName = currentLang === 'uk' ? 
+                    (t.categories[item.category] || item.category) : 
+                    item.category;
+                
+                return `
+                    <tr>
+                        <td><strong>${getDisplayName(item.name, currentLang)}</strong></td>
+                        <td><span class="category-tag cat-${item.category}">${catName}</span></td>
+                        <td>${parseFloat(item.q_low).toFixed(0)}</td>
+                        <td>${parseFloat(item.v_spread).toFixed(4)}</td>
+                        <td>${parseFloat(item.psi_ud).toFixed(4)}</td>
+                        <td>${parseFloat(item.smoke_capacity).toFixed(1)}</td>
+                        <td>${parseFloat(item.o2_consumption).toFixed(3)}</td>
+                        <td>${parseFloat(item.co2_emission).toFixed(3)}</td>
+                        <td>${parseFloat(item.co_emission).toFixed(4)}</td>
+                        <td>${parseFloat(item.hcl_emission).toFixed(4)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            fetchData(e.target.value);
+        });
+
+        // Initial load
+        fetchData();
+    </script>
+</body>
+</html>
