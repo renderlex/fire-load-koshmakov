@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+.env
+*.log
+fire-load-app/node_modules/
+fire-load-public/
+DEPLOY.md
+donat.txt
