@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireLoad Pro - Зональний метод</title>
+    <!-- Підключаємо KaTeX без defer для миттєвого завантаження -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --primary: #1e3a8a;
+            --accent: #2563eb;
+            --text: #0f172a;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px double var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+
+        .setup-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width { grid-column: span 3; }
+
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: bold; font-size: 14px; color: var(--primary); }
+        input, select { 
+            padding: 10px; 
+            border: 1px solid #94a3b8; 
+            border-radius: 4px; 
+            font-size: 16px;
+        }
+
+        .calc-step {
+            margin-bottom: 40px;
+            padding: 20px;
+            border-left: 5px solid var(--accent);
+            background: #fff;
+        }
+
+        .step-h {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .formula-box {
+            margin: 15px 0;
+            padding: 15px;
+            background: #fdfdfd;
+            border: 1px dashed #cbd5e1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .note { font-style: italic; color: #64748b; font-size: 14px; margin-bottom: 10px; }
+        
+        .result-val {
+            color: #b91c1c;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* ======= КІЛЬКА ПРИМІЩЕНЬ ======= */
+        .rooms-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .rooms-header h3 { margin: 0; color: var(--primary); font-size: 16px; }
+        .btn-add-room {
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-add-room:hover { background: #15803d; }
+        .room-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+        .room-card-header {
+            background: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .btn-remove-room {
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .room-card-body {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px;
+        }
+        .room-card-body .input-group label { font-size: 12px; }
+        .room-card-body input, .room-card-body select {
+            padding: 7px; font-size: 14px;
+        }
+
+        /* ======= ЗАГАЛЬНИЙ ВИБІР МАТЕРІАЛУ ======= */
+        .global-mat-box {
+            background: #eff6ff;
+            border: 1px solid #93c5fd;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        /* ======= TABS ======= */
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 0;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 8px 16px;
+            border: 1px solid #cbd5e1;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            background: #e2e8f0;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            color: #475569;
+        }
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            border-color: #94a3b8;
+        }
+        .tab-content {
+            border: 1px solid #94a3b8;
+            border-radius: 0 6px 6px 6px;
+            padding: 20px;
+            background: white;
+            display: none;
+        }
+        .tab-content.active { display: block; }
+
+        /* ======= ВІЗУАЛІЗАЦІЯ ======= */
+        .viz-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .viz-room {
+            flex: 1;
+            min-width: 200px;
+        }
+        .viz-room h4 {
+            margin: 0 0 6px 0;
+            font-size: 14px;
+            color: var(--primary);
+            text-align: center;
+        }
+        canvas.room-canvas {
+            width: 100%;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            display: block;
+        }
+
+        /* ======= ЗВЕДЕНА ТАБЛИЦЯ ======= */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .summary-table th {
+            background: var(--primary);
+            color: white;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .summary-table td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .summary-table tr:nth-child(even) td { background: #f8fafc; }
+        .status-ok { color: #16a34a; font-weight: bold; }
+        .status-ex { color: #dc2626; font-weight: bold; }
+        .room-results-detail { margin-top: 20px; }
+
+        /* ===== ТИПИ КІМНАТ ===== */
+        .room-type-fire .room-card-header { background: linear-gradient(135deg, #7f1d1d 0%, #1e3a8a 100%); }
+        .room-type-adj  .room-card-header { background: linear-gradient(135deg, #1e4d8c 0%, #065f46 100%); }
+
+        .opening-params {
+            grid-column: span 4;
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            padding: 10px 14px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .opening-params label { color: #065f46; font-size: 12px; }
+
+        /* ===== SVG ВІЗУАЛІЗАЦІЯ ===== */
+        .viz-svg-wrap {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+        .viz-svg-wrap svg { display: block; margin: 0 auto; }
+
+        /* ===== ЛЕГЕНДА ===== */
+        .legend-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: 12px;
+            color: #374151;
+            margin-top: 8px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-box { width: 16px; height: 16px; border-radius: 2px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <h1>ЗОНАЛЬНИЙ МЕТОД РОЗРАХУНКУ ПОЖЕЖІ</h1>
+            <p>Науковий калькулятор динаміки НЧП за Ю.А. Кошмаровим</p>
+        </header>
+
+        <!-- Глобальний вибір матеріалу і часу -->
+        <div class="global-mat-box">
+            <div style="display:grid; grid-template-columns:2fr 1fr; gap:16px; align-items:end;">
+                <div class="input-group">
+                    <label>Матеріал пожежного навантаження (для всіх приміщень):</label>
+                    <select id="matSelect" onchange="calculateAll()">
+                        <option value="">Завантаження даних...</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Час розрахунку $t$, с:</label>
+                    <input type="number" id="time" value="120" step="1" oninput="calculateAll()">
+                </div>
+            </div>
+            <p style="margin:10px 0 0; font-size:13px; color:#0369a1;">
+                <b>Методика:</b> ДСТУ 8828:2019, розділ А.8.4. Матеріал горіння — для приміщення з вогнищем.
+                Суміжні приміщення задимлюються через прорізи — <b>G_П ≠ 0</b>, формула Бернуллі з плавучістю.
+            </p>
+        </div>
+
+        <!-- Секція приміщень -->
+        <div style="margin-bottom:20px;">
+            <div class="rooms-header">
+                <h3>Схема приміщень</h3>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-add-room" onclick="addRoom('adjacent')" style="background:#0e7490;">+ Суміжне приміщення</button>
+                </div>
+            </div>
+            <div id="rooms-list"></div>
+        </div>
+
+        <button class="btn-action" onclick="calculateAll()" style="margin-bottom:20px;">
+            РОЗРАХУВАТИ ВСІ ПРИМІЩЕННЯ
+        </button>
+
+        <!-- Результати — вкладки -->
+        <div id="results-section" style="display:none;">
+            <h2 style="color:var(--primary); border-bottom:2px solid var(--accent); padding-bottom:8px;">
+                Результати розрахунку
+            </h2>
+
+            <!-- Вкладки -->
+            <div class="tab-bar" id="tab-bar"></div>
+            <div id="tab-contents"></div>
+        </div>
+
+        <button class="btn-action" onclick="window.print()" style="margin-top:20px;">
+            ДРУКУВАТИ ПОВНИЙ ЗВІТ РОЗРАХУНКУ
+        </button>
+    </div>
+
+    <script>
+        let fireData = [];
+        let rooms = [];
+        let roomIdCounter = 1;
+        let currentT = 120;
+
+        async function init() {
+            try {
+                const res = await fetch('/api/fire-loads');
+                fireData = await res.json();
+                const sel = document.getElementById('matSelect');
+                if (fireData.length > 0)
+                    sel.innerHTML = fireData.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+            } catch(e) { console.error(e); }
+            addRoom('fire');
+            addRoom('adjacent');
+        }
+
+        // ============================================================
+        // ДСТУ 8828:2019, розділ А.8.4 — Двозонна модель
+        // ============================================================
+
+        function G_K_formula(Q, Z) {
+            if (Q < 1e-6) return 0;
+            const Q25 = Math.pow(Q, 2/5);
+            const z   = Z / Q25;
+            if (z < 0.081) return 0.011 * Q * Math.pow(z, 0.566);
+            if (z < 0.206) return 0.026 * Q * Math.pow(z, 0.909);
+            return 0.124 * Q * Math.pow(z, 1.895);
+        }
+
+        function gkZoneName(Q, Z) {
+            if (Q < 1e-6) return '';
+            const z = Z / Math.pow(Q, 2/5);
+            if (z < 0.081) return 'факел';
+            if (z < 0.206) return 'перехідна';
+            return 'конв. колонка';
+        }
+
+        // Витрата диму через проріз — G_П (кг/с)
+        // Формула Бернуллі з плавучістю (Koshmaro / ДСТУ А.8.4):
+        //   G_П = μ_д · b_д · (2/3) · √(2·g·ρ₁·(ρ_a−ρ₁)) · δ^(3/2)
+        // де δ — висота задимленої частини прорізу [м]
+        //    μ_д = 0.64 — коефіцієнт витікання
+        function calcGp(rho1, rho_a, b_d, h_d, sill, Z1) {
+            const openTop = sill + h_d;
+            if (Z1 >= openTop) return 0;
+            const delta = Math.max(0, openTop - Math.max(Z1, sill));
+            if (delta < 1e-9) return 0;
+            const drho = rho_a - rho1;
+            if (drho < 1e-9) return 0;
+            const g = 9.81, mu_d = 0.64;
+            return mu_d * b_d * (2/3) * Math.sqrt(2 * g * rho1 * drho) * Math.pow(delta, 1.5);
+        }
+
+        // ============================================================
+        // Зв'язана симуляція всіх приміщень — метод Ейлера, Δt = 0.5 с
+        // ============================================================
+        function simulateAllRooms(roomDefs, mat, t_end) {
+            const Cp = 1.005, rho_a = 1.2, T_a = 293.15, eta = 0.7;
+            const v    = mat.v_spread,  psi   = mat.psi_ud,   q_low = mat.q_low;
+            const Dm   = mat.smoke_capacity;
+            const L_ox = Math.abs(mat.o2_consumption);
+            const L_CO2 = mat.co2_emission, L_CO = mat.co_emission, L_HCl = mat.hcl_emission;
+            const dt = 0.5;
+
+            const fireRoom = roomDefs.find(r => r.type === 'fire');
+            if (!fireRoom) return [];
+
+            const state = {};
+            roomDefs.forEach(rm => {
+                state[rm.id] = { m:1e-9, Qz:0, m_ox:0, S_opt:0, m_CO2:0, m_CO:0, m_HCl:0, history:[], lastGp:0 };
+            });
+
+            for (let tt = dt; tt <= t_end + dt * 0.5; tt += dt) {
+                const tc = Math.min(tt, t_end);
+                const fs = state[fireRoom.id];
+
+                // --- Поточний стан приміщення з вогнищем ---
+                const T1   = fs.m > 1e-6 ? T_a + fs.Qz / (fs.m * Cp) : T_a;
+                const rho1 = rho_a * T_a / T1;
+                const Vd1  = fs.m / rho1;
+                const Z1   = Math.max(fireRoom.H - Vd1 / fireRoom.S, 0.01);
+
+                // --- Динаміка вогнища ---
+                const F_fire = Math.min(Math.PI * v * v * tc * tc, fireRoom.S);
+                const Psi    = psi * F_fire;
+                const Q_fire = eta * Psi * q_low;
+                const Gk     = G_K_formula(Q_fire, Z1);
+
+                // --- Сумарний відтік G_П через всі прорізи ---
+                let totalGp = 0;
+                const adjRooms = roomDefs.filter(r => r.type === 'adjacent' && r.sourceId === fireRoom.id);
+                adjRooms.forEach(adj => {
+                    const gp = calcGp(rho1, rho_a, adj.openW, adj.openH, adj.openSill, Z1);
+                    state[adj.id].lastGp = gp;
+                    totalGp += gp;
+                });
+
+                // --- Масові частки у зоні диму приміщення з вогнищем ---
+                const xOx  = fs.m > 1e-9 ? fs.m_ox  / fs.m : 0;
+                const xCO2 = fs.m > 1e-9 ? fs.m_CO2 / fs.m : 0;
+                const xCO  = fs.m > 1e-9 ? fs.m_CO  / fs.m : 0;
+                const xHCl = fs.m > 1e-9 ? fs.m_HCl / fs.m : 0;
+                const sPkg = fs.m > 1e-9 ? fs.S_opt  / fs.m : 0;
+
+                // А.65: dm/dt = G_K − G_П
+                fs.m     = Math.max(1e-9, fs.m     + (Gk - totalGp) * dt);
+                // А.66: dQ_З/dt = Q_вогн − G_П·Cp·(T₁−T_a)
+                fs.Qz    = Math.max(0,    fs.Qz    + (Q_fire - totalGp * Cp * (T1 - T_a)) * dt);
+                // А.67: dm_ox/dt = 0.23·(G_K − η·Ψ·L_ox) − x_ox·G_П
+                fs.m_ox  = Math.max(0,    fs.m_ox  + (0.23 * (Gk - eta * Psi * L_ox) - xOx  * totalGp) * dt);
+                // А.68: dS/dt = Ψ·D_m − (S/m)·G_П
+                fs.S_opt = Math.max(0,    fs.S_opt + (Psi * Dm - sPkg * totalGp) * dt);
+                // А.69: dm_i/dt = Ψ·L_i − x_i·G_П
+                fs.m_CO2 = Math.max(0,    fs.m_CO2 + (Psi * L_CO2 - xCO2 * totalGp) * dt);
+                fs.m_CO  = Math.max(0,    fs.m_CO  + (Psi * L_CO  - xCO  * totalGp) * dt);
+                fs.m_HCl = Math.max(0,    fs.m_HCl + (Psi * L_HCl - xHCl * totalGp) * dt);
+
+                // --- Суміжні приміщення ---
+                adjRooms.forEach(adj => {
+                    const as_ = state[adj.id];
+                    const Gp  = as_.lastGp;
+                    if (Gp < 1e-12) return;
+                    // Склад диму, що надходить = масові частки зони диму вогнища
+                    const xi_ox   = fs.m > 1e-9 ? fs.m_ox  / fs.m : 0;
+                    const xi_CO2  = fs.m > 1e-9 ? fs.m_CO2 / fs.m : 0;
+                    const xi_CO   = fs.m > 1e-9 ? fs.m_CO  / fs.m : 0;
+                    const xi_HCl  = fs.m > 1e-9 ? fs.m_HCl / fs.m : 0;
+                    const si_Pkg  = fs.m > 1e-9 ? fs.S_opt  / fs.m : 0;
+
+                    // А.65 (сум): dm₂/dt = G_П
+                    as_.m     += Gp * dt;
+                    // А.66 (сум): dQ₂/dt = G_П·Cp·(T₁−T_a)
+                    as_.Qz    = Math.max(0, as_.Qz    + Gp * Cp * (T1 - T_a) * dt);
+                    // А.67 (сум): dm_ox,2/dt = G_П·x_ox,1
+                    as_.m_ox  = Math.max(0, as_.m_ox  + Gp * xi_ox  * dt);
+                    // А.68 (сум): dS₂/dt = G_П·(S₁/m₁)
+                    as_.S_opt = Math.max(0, as_.S_opt + Gp * si_Pkg  * dt);
+                    // А.69 (сум):
+                    as_.m_CO2 = Math.max(0, as_.m_CO2 + Gp * xi_CO2 * dt);
+                    as_.m_CO  = Math.max(0, as_.m_CO  + Gp * xi_CO  * dt);
+                    as_.m_HCl = Math.max(0, as_.m_HCl + Gp * xi_HCl * dt);
+                });
+
+                // --- Запис в часовий ряд (кожні 2 с) ---
+                if (Math.round(tt * 2) % 4 === 0) {
+                    roomDefs.forEach(rm => {
+                        const s  = state[rm.id];
+                        const Tc = s.m > 1e-6 ? T_a + s.Qz / (s.m * Cp) : T_a;
+                        const rc = rho_a * T_a / Tc;
+                        const Vc = s.m / rc;
+                        const Zc = Math.max(rm.H - Vc / rm.S, 0.01);
+                        const mu = Vc > 1e-9 ? s.S_opt / Vc : 0;
+                        s.history.push({
+                            t: tc, Z: Zc, T: Tc,
+                            mu, Lvis: mu > 1e-9 ? 2.38 / mu : 9999,
+                            C_O2:  Vc > 1e-9 ? s.m_ox  / Vc : 0,
+                            C_CO2: Vc > 1e-9 ? s.m_CO2 / Vc : 0,
+                            C_CO:  Vc > 1e-9 ? s.m_CO  / Vc : 0,
+                            C_HCl: Vc > 1e-9 ? s.m_HCl / Vc : 0,
+                        });
+                    });
+                }
+            }
+
+            return roomDefs.map(rm => {
+                const s  = state[rm.id];
+                const Tf = s.m > 1e-6 ? T_a + s.Qz / (s.m * Cp) : T_a;
+                const rf = rho_a * T_a / Tf;
+                const Vf = s.m / rf;
+                const Zf = Math.max(rm.H - Vf / rm.S, 0.01);
+                const muf  = Vf > 1e-9 ? s.S_opt / Vf : 0;
+                const C_O2  = Vf > 1e-9 ? s.m_ox  / Vf : 0;
+                const C_CO2 = Vf > 1e-9 ? s.m_CO2 / Vf : 0;
+                const C_CO  = Vf > 1e-9 ? s.m_CO  / Vf : 0;
+                const C_HCl = Vf > 1e-9 ? s.m_HCl / Vf : 0;
+
+                let F_fire=0, Psi_t=0, Q_t=0, Gk_t=0, zeta_t=0;
+                if (rm.type === 'fire') {
+                    F_fire = Math.min(Math.PI * v * v * t_end * t_end, rm.S);
+                    Psi_t  = psi * F_fire;
+                    Q_t    = eta * Psi_t * q_low;
+                    Gk_t   = G_K_formula(Q_t, Zf);
+                    zeta_t = Q_t > 1e-6 ? Zf / Math.pow(Q_t, 2/5) : 0;
+                }
+
+                let GpFinal = 0;
+                if (rm.type === 'adjacent') {
+                    const src = roomDefs.find(r => r.id === rm.sourceId);
+                    if (src) {
+                        const ss = state[src.id];
+                        const Ts = ss.m > 1e-6 ? T_a + ss.Qz / (ss.m * Cp) : T_a;
+                        const rs = rho_a * T_a / Ts;
+                        const Vs = ss.m / rs;
+                        const Zs = Math.max(src.H - Vs / src.S, 0.01);
+                        GpFinal = calcGp(rs, rho_a, rm.openW, rm.openH, rm.openSill, Zs);
+                    }
+                }
+
+                const h    = s.history;
+                const cT   = h.find(p => (p.T - 273.15) > 60);
+                const cVis = h.find(p => p.Lvis < 20);
+                const cO2  = h.find(p => p.C_O2 < 0.226);
+                const cCO2 = h.find(p => p.C_CO2 > 0.11);
+                const cCO  = h.find(p => p.C_CO > 1.16e-3);
+                const cHCl = h.find(p => p.C_HCl > 23e-6);
+                const cts  = [cT, cVis, cO2, cCO2, cCO, cHCl].filter(Boolean).map(p => p.t);
+
+                return {
+                    room: rm, T: Tf, Vd: Vf, rho: rf, Z: Zf,
+                    m: s.m, Qz: s.Qz, m_ox: s.m_ox, S: s.S_opt,
+                    m_CO2: s.m_CO2, m_CO: s.m_CO, m_HCl: s.m_HCl,
+                    mu: muf, C_O2, C_CO2, C_CO, C_HCl,
+                    xk: s.m > 1e-9 ? s.m_ox / s.m : 0,
+                    xCO2: s.m > 1e-9 ? s.m_CO2 / s.m : 0,
+                    xCO:  s.m > 1e-9 ? s.m_CO  / s.m : 0,
+                    xHCl: s.m > 1e-9 ? s.m_HCl / s.m : 0,
+                    F_fire, Psi: Psi_t, Q_fire: Q_t, Gk: Gk_t, zeta: zeta_t,
+                    zone: gkZoneName(Q_t, Zf),
+                    L_vis: muf > 1e-9 ? 2.38 / muf : 9999,
+                    Gp: GpFinal, history: h,
+                    t_crit: cts.length > 0 ? Math.min(...cts) : null,
+                    critT: cT ? cT.t : null, critVis: cVis ? cVis.t : null,
+                    critO2: cO2 ? cO2.t : null, critCO2: cCO2 ? cCO2.t : null,
+                    critCO: cCO ? cCO.t : null, critHCl: cHCl ? cHCl.t : null,
+                };
+            });
+        }
+
+        // ============================================================
+        // Управління кімнатами
+        // ============================================================
+        function addRoom(type) {
+            const id = roomIdCounter++;
+            const isFirst = rooms.length === 0;
+            const rType = type || (isFirst ? 'fire' : 'adjacent');
+            const fireRoom = rooms.find(r => r.type === 'fire');
+            const adjCount = rooms.filter(r => r.type === 'adjacent').length;
+            rooms.push({
+                id, type: rType,
+                name: rType === 'fire' ? 'Кімната з вогнищем' : 'Суміжна ' + (adjCount + 1),
+                S: rType === 'fire' ? 25 : 18,
+                H: 3.0,
+                sourceId: fireRoom ? fireRoom.id : null,
+                openW: 1.0, openH: 2.1, openSill: 0.0
+            });
+            renderRoomList();
+            if (fireData.length) calculateAll();
+        }
+
+        function removeRoom(id) {
+            const rm = rooms.find(r => r.id === id);
+            if (!rm) return;
+            if (rm.type === 'fire') { alert('Приміщення з вогнищем видалити не можна.'); return; }
+            if (rooms.length <= 1) { alert('Потрібно хоча б одне приміщення.'); return; }
+            rooms = rooms.filter(r => r.id !== id);
+            renderRoomList();
+            if (fireData.length) calculateAll();
+        }
+
+        function renderRoomList() {
+            const fireRoom = rooms.find(r => r.type === 'fire');
+            document.getElementById('rooms-list').innerHTML = rooms.map(room => {
+                const isFire = room.type === 'fire';
+                const icon = isFire ? '🔥' : '🚪';
+                const lbl  = isFire ? 'ВОГНИЩЕ' : 'СУМІЖНЕ';
+                const canDel = !isFire;
+
+                const openFields = !isFire ? `
+                <div class="opening-params">
+                    <div class="input-group">
+                        <label>Ширина прорізу b, м:</label>
+                        <input type="number" id="r_ow_${room.id}" value="${room.openW}" step="0.05" min="0.1" max="5" oninput="calculateAll()">
+                    </div>
+                    <div class="input-group">
+                        <label>Висота прорізу h_д, м:</label>
+                        <input type="number" id="r_oh_${room.id}" value="${room.openH}" step="0.05" min="0.1" oninput="calculateAll()">
+                    </div>
+                    <div class="input-group">
+                        <label>Підвіконня h_підл, м:</label>
+                        <input type="number" id="r_os_${room.id}" value="${room.openSill}" step="0.05" min="0" oninput="calculateAll()">
+                    </div>
+                    <div class="input-group" style="justify-content:flex-end; padding-top:18px;">
+                        <small style="color:#065f46;">← через проріз з: <b>${fireRoom ? fireRoom.name : '—'}</b></small>
+                    </div>
+                </div>` : '';
+
+                return `<div class="room-card ${isFire ? 'room-type-fire' : 'room-type-adj'}" id="room_card_${room.id}">
+                    <div class="room-card-header">
+                        <span id="rh_${room.id}">${icon} [${lbl}] ${room.name}</span>
+                        <button class="btn-remove-room" onclick="removeRoom(${room.id})" ${canDel ? '' : 'disabled style="opacity:0.4;cursor:default"'}>Видалити</button>
+                    </div>
+                    <div class="room-card-body">
+                        <div class="input-group">
+                            <label>Назва:</label>
+                            <input type="text" id="r_name_${room.id}" value="${room.name}"
+                                oninput="rooms.find(r=>r.id==${room.id}).name=this.value; document.getElementById('rh_${room.id}').textContent='${icon} [${lbl}] '+this.value;">
+                        </div>
+                        <div class="input-group">
+                            <label>Площа S, м²:</label>
+                            <input type="number" id="r_S_${room.id}" value="${room.S}" step="0.5" min="1" oninput="calculateAll()">
+                        </div>
+                        <div class="input-group">
+                            <label>Висота H, м:</label>
+                            <input type="number" id="r_H_${room.id}" value="${room.H}" step="0.1" min="1" oninput="calculateAll()">
+                        </div>
+                        <div></div>
+                        ${openFields}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function calculateAll() {
+            const mat = fireData.find(m => m.id == document.getElementById('matSelect').value);
+            if (!mat) return;
+            currentT = parseFloat(document.getElementById('time').value) || 120;
+
+            rooms.forEach(rm => {
+                rm.name = document.getElementById(`r_name_${rm.id}`)?.value || rm.name;
+                rm.S    = parseFloat(document.getElementById(`r_S_${rm.id}`)?.value) || 20;
+                rm.H    = parseFloat(document.getElementById(`r_H_${rm.id}`)?.value) || 3.0;
+                if (rm.type === 'adjacent') {
+                    rm.openW    = parseFloat(document.getElementById(`r_ow_${rm.id}`)?.value) || 1.0;
+                    rm.openH    = parseFloat(document.getElementById(`r_oh_${rm.id}`)?.value) || 2.1;
+                    rm.openSill = parseFloat(document.getElementById(`r_os_${rm.id}`)?.value) || 0.0;
+                    const fr = rooms.find(r => r.type === 'fire');
+                    if (fr) rm.sourceId = fr.id;
+                }
+            });
+
+            const results = simulateAllRooms(rooms, mat, currentT);
+            renderResults(results, mat, currentT);
+        }
+
+        // ============================================================
+        // SVG-схема (перетин будівлі)
+        // ============================================================
+        function buildSchematicSVG(results, t) {
+            const RW = 170, RH = 230, WT = 14, PTB = 55, PLR = 30, BET = 12;
+            const n = results.length;
+            const SVG_W = PLR * 2 + n * RW + (n - 1) * (WT + BET) + 40;
+            const SVG_H = RH + PTB * 2 + 50;
+
+            const L = [];
+            L.push(`<svg width="${SVG_W}" height="${SVG_H}" viewBox="0 0 ${SVG_W} ${SVG_H}" xmlns="http://www.w3.org/2000/svg" style="font-family:Arial,sans-serif">`);
+            L.push(`<defs>
+  <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#111827" stop-opacity="0.94"/>
+    <stop offset="75%"  stop-color="#374151" stop-opacity="0.75"/>
+    <stop offset="100%" stop-color="#9ca3af" stop-opacity="0.4"/>
+  </linearGradient>
+  <pattern id="wp" width="10" height="10" patternUnits="userSpaceOnUse">
+    <rect width="10" height="10" fill="#94a3b8"/>
+    <line x1="0" y1="0" x2="10" y2="10" stroke="#64748b" stroke-width="1.2"/>
+    <line x1="0" y1="10" x2="10" y2="0" stroke="#64748b" stroke-width="0.5" opacity="0.4"/>
+  </pattern>
+  <marker id="mArr" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0,0 9,3.5 0,7" fill="#b91c1c"/>
+  </marker>
+  <marker id="mConv" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+    <polygon points="0,0 7,3 0,6" fill="#b45309"/>
+  </marker>
+</defs>`);
+
+            // Заголовок
+            L.push(`<text x="${SVG_W/2}" y="22" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="bold" letter-spacing="0.3">ДВОЗОННА МОДЕЛЬ ПОЖЕЖІ — ДСТУ 8828:2019 А.8.4 (t = ${t} с)</text>`);
+
+            results.forEach((res, i) => {
+                const rm  = res.room;
+                const x0  = PLR + i * (RW + WT + BET);
+                const y0  = PTB;
+                const sRatio = Math.min((rm.H - res.Z) / rm.H, 1);
+                const sHpx   = RH * sRatio;
+                const zY     = y0 + sHpx;
+                const T_C    = (res.T - 273.15).toFixed(0);
+                const scY    = RH / rm.H;
+
+                // ---- Зона чистого повітря ----
+                L.push(`<rect x="${x0}" y="${y0}" width="${RW}" height="${RH}" fill="#bfdbfe" rx="0"/>`);
+                // ---- Задимлена зона ----
+                if (sHpx > 0.5)
+                    L.push(`<rect x="${x0}" y="${y0}" width="${RW}" height="${sHpx.toFixed(1)}" fill="url(#sg)"/>`);
+
+                // ---- Стеля ----
+                L.push(`<rect x="${x0-WT}" y="${y0-WT}" width="${RW+WT*2}" height="${WT}" fill="url(#wp)" stroke="#475569" stroke-width="1.5"/>`);
+                // ---- Підлога ----
+                L.push(`<rect x="${x0-WT}" y="${y0+RH}" width="${RW+WT*2}" height="${WT}" fill="url(#wp)" stroke="#475569" stroke-width="1.5"/>`);
+
+                // ---- Ліва стіна (тільки для першої кімнати) ----
+                if (i === 0)
+                    L.push(`<rect x="${x0-WT}" y="${y0}" width="${WT}" height="${RH}" fill="url(#wp)" stroke="#475569" stroke-width="1.5"/>`);
+
+                // ---- Права стіна (з прорізом або суцільна) ----
+                const nxtRes = results[i + 1];
+                const hasOp  = nxtRes && nxtRes.room.type === 'adjacent' && nxtRes.room.sourceId === rm.id;
+                if (!hasOp) {
+                    L.push(`<rect x="${x0+RW}" y="${y0}" width="${WT}" height="${RH}" fill="url(#wp)" stroke="#475569" stroke-width="1.5"/>`);
+                } else {
+                    const oH   = nxtRes.room.openH, oS = nxtRes.room.openSill;
+                    const gBot = y0 + RH - oS * scY;
+                    const gTop = y0 + RH - (oS + oH) * scY;
+                    const gH   = gBot - gTop;
+                    if (gTop > y0)
+                        L.push(`<rect x="${x0+RW}" y="${y0}" width="${WT}" height="${(gTop-y0).toFixed(1)}" fill="url(#wp)" stroke="#475569" stroke-width="1.5"/>`);
+                    if (gBot < y0 + RH)
+                        L.push(`<rect x="${x0+RW}" y="${gBot.toFixed(1)}" width="${WT}" height="${(y0+RH-gBot).toFixed(1)}" fill="url(#wp)" stroke="#475569" stroke-width="1.5"/>`);
+                    // Проріз — рамка
+                    L.push(`<rect x="${x0+RW}" y="${gTop.toFixed(1)}" width="${WT}" height="${gH.toFixed(1)}" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>`);
+                    // Розміри прорізу
+                    const midOY = ((gTop + gBot) / 2).toFixed(1);
+                    L.push(`<text x="${x0+RW+WT/2}" y="${midOY}" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="#16a34a" font-weight="bold" transform="rotate(-90,${x0+RW+WT/2},${midOY})">${nxtRes.room.openW}×${oH}м</text>`);
+                }
+
+                // ---- Межа задимленого шару (Z) ----
+                L.push(`<line x1="${x0}" y1="${zY.toFixed(1)}" x2="${x0+RW}" y2="${zY.toFixed(1)}" stroke="#dc2626" stroke-width="2" stroke-dasharray="8,4"/>`);
+
+                // ---- Підпис Z ----
+                const zLblY = Math.max(zY - 7, y0 + 14);
+                L.push(`<text x="${x0+RW/2}" y="${zLblY.toFixed(1)}" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="bold">Z = ${res.Z.toFixed(2)} м</text>`);
+
+                // ---- Температура у зоні диму ----
+                if (sHpx > 35) {
+                    const tY = y0 + sHpx * 0.5;
+                    L.push(`<text x="${x0+RW/2}" y="${(tY-8).toFixed(1)}" text-anchor="middle" font-size="15" fill="white" font-weight="bold">${T_C}°C</text>`);
+                    L.push(`<text x="${x0+RW/2}" y="${(tY+10).toFixed(1)}" text-anchor="middle" font-size="9" fill="#d1d5db">T = ${res.T.toFixed(0)} К</text>`);
+                    if (sHpx > 70) {
+                        const lvis = res.L_vis < 9999 ? res.L_vis.toFixed(1)+'м' : '> 9999м';
+                        L.push(`<text x="${x0+RW/2}" y="${(tY+26).toFixed(1)}" text-anchor="middle" font-size="9" fill="#fca5a5">видимість: ${lvis}</text>`);
+                    }
+                }
+
+                if (rm.type === 'fire') {
+                    // ---- Полум'я ----
+                    const fx = x0 + RW / 2, fy = y0 + RH;
+                    L.push(`<path d="M${fx},${fy-44} C${fx-15},${fy-32} ${fx-18},${fy-18} ${fx-10},${fy-4} Q${fx},${fy-14} ${fx+10},${fy-4} C${fx+18},${fy-18} ${fx+15},${fy-32} ${fx},${fy-44}Z" fill="#ef4444" opacity="0.93"/>`);
+                    L.push(`<path d="M${fx},${fy-30} C${fx-10},${fy-22} ${fx-12},${fy-12} ${fx-6},${fy-3} L${fx+6},${fy-3} C${fx+12},${fy-12} ${fx+10},${fy-22} ${fx},${fy-30}Z" fill="#f97316"/>`);
+                    L.push(`<path d="M${fx},${fy-18} C${fx-5},${fy-13} ${fx-6},${fy-7} ${fx-3},${fy-1} L${fx+3},${fy-1} C${fx+6},${fy-7} ${fx+5},${fy-13} ${fx},${fy-18}Z" fill="#fde047"/>`);
+                    L.push(`<ellipse cx="${fx}" cy="${fy}" rx="18" ry="4" fill="#b45309" opacity="0.5"/>`);
+                    // Конвективна колонка
+                    for (let ay = fy - 50; ay > zY + 16; ay -= 22) {
+                        L.push(`<line x1="${fx}" y1="${ay+8}" x2="${fx}" y2="${ay}" stroke="#b45309" stroke-width="2" marker-end="url(#mConv)" opacity="0.7"/>`);
+                    }
+                    // G_K label
+                    L.push(`<text x="${fx+20}" y="${(y0+RH-52).toFixed(1)}" font-size="9" fill="#92400e">G_K=${res.Gk.toFixed(3)}</text>`);
+                    // G_K units
+                    L.push(`<text x="${fx+20}" y="${(y0+RH-42).toFixed(1)}" font-size="8" fill="#a16207">кг/с</text>`);
+                } else {
+                    // ---- Суміжна: стрілка потоку G_П ----
+                    const oSill = rm.openSill || 0, oH = rm.openH || 2.0;
+                    const arrowY = y0 + RH - (oSill + oH / 2) * scY;
+                    if (res.Gp > 1e-6) {
+                        const ax0 = x0 - WT - BET;
+                        L.push(`<line x1="${ax0}" y1="${arrowY.toFixed(1)}" x2="${x0}" y2="${arrowY.toFixed(1)}" stroke="#b91c1c" stroke-width="3" marker-end="url(#mArr)"/>`);
+                        L.push(`<text x="${(ax0 + WT/2).toFixed(1)}" y="${(arrowY-8).toFixed(1)}" text-anchor="middle" font-size="9" fill="#b91c1c" font-weight="bold">G_П=${res.Gp.toFixed(3)}</text>`);
+                        L.push(`<text x="${(ax0 + WT/2).toFixed(1)}" y="${(arrowY+13).toFixed(1)}" text-anchor="middle" font-size="8" fill="#991b1b">кг/с</text>`);
+                    } else {
+                        const ax0 = x0 - WT - BET + 2;
+                        L.push(`<text x="${(ax0 + WT/2).toFixed(1)}" y="${arrowY.toFixed(1)}" text-anchor="middle" font-size="9" fill="#94a3b8">G_П=0</text>`);
+                    }
+                    // Підпис
+                    L.push(`<text x="${x0+RW/2}" y="${y0+RH-12}" text-anchor="middle" font-size="10" fill="#374151" font-style="italic">суміжне</text>`);
+                }
+
+                // ---- Розмір H (права сторона) ----
+                const hax = x0 + RW + WT + 6;
+                L.push(`<line x1="${hax}" y1="${y0}" x2="${hax}" y2="${y0+RH}" stroke="#94a3b8" stroke-width="1"/>`);
+                L.push(`<line x1="${hax-3}" y1="${y0}" x2="${hax+3}" y2="${y0}" stroke="#94a3b8" stroke-width="1"/>`);
+                L.push(`<line x1="${hax-3}" y1="${y0+RH}" x2="${hax+3}" y2="${y0+RH}" stroke="#94a3b8" stroke-width="1"/>`);
+                L.push(`<text x="${hax+4}" y="${y0+RH/2}" dominant-baseline="middle" font-size="9" fill="#64748b">H=${rm.H}м</text>`);
+
+                // ---- Назва кімнати ----
+                const typeTag = rm.type === 'fire' ? '🔥' : '🚪';
+                L.push(`<text x="${x0+RW/2}" y="${y0+RH+WT+18}" text-anchor="middle" font-size="11" fill="#1e3a8a" font-weight="bold">${rm.name}</text>`);
+                L.push(`<text x="${x0+RW/2}" y="${y0+RH+WT+32}" text-anchor="middle" font-size="10" fill="#64748b">S = ${rm.S} м²</text>`);
+
+                // ---- t_кр ----
+                const tLabel = res.t_crit !== null ? `t_кр = ${res.t_crit.toFixed(0)} с` : `> ${t} с`;
+                const tClr   = res.t_crit !== null ? '#dc2626' : '#16a34a';
+                L.push(`<text x="${x0+RW/2}" y="${y0+RH+WT+46}" text-anchor="middle" font-size="10" fill="${tClr}" font-weight="bold">${tLabel}</text>`);
+            });
+
+            // Легенда
+            const legY = SVG_H - 14;
+            L.push(`<rect x="${PLR}" y="${legY-12}" width="12" height="12" fill="url(#sg)"/>`);
+            L.push(`<text x="${PLR+16}" y="${legY-2}" font-size="10" fill="#374151">Задимлена зона</text>`);
+            L.push(`<rect x="${PLR+115}" y="${legY-12}" width="12" height="12" fill="#bfdbfe" stroke="#93c5fd" stroke-width="1"/>`);
+            L.push(`<text x="${PLR+131}" y="${legY-2}" font-size="10" fill="#374151">Чиста зона (T₀)</text>`);
+            L.push(`<line x1="${PLR+240}" y1="${legY-6}" x2="${PLR+260}" y2="${legY-6}" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,3"/>`);
+            L.push(`<text x="${PLR+264}" y="${legY-2}" font-size="10" fill="#374151">Межа зон Z</text>`);
+            L.push(`<line x1="${PLR+340}" y1="${legY-6}" x2="${PLR+356}" y2="${legY-6}" stroke="#b91c1c" stroke-width="2.5" marker-end="url(#mArr)"/>`);
+            L.push(`<text x="${PLR+360}" y="${legY-2}" font-size="10" fill="#374151">G_П (потік диму)</text>`);
+
+            L.push(`</svg>`);
+            return L.join('\n');
+        }
+
+        // ============================================================
+        // Рендер результатів
+        // ============================================================
+        function renderResults(results, mat, t) {
+            document.getElementById('results-section').style.display = 'block';
+
+            const tabs      = ['summary', ...results.map((_, i) => `room_${i}`)];
+            const tabLabels = ['Зведення', ...results.map(res => res.room.name)];
+
+            document.getElementById('tab-bar').innerHTML = tabLabels.map((lbl, i) =>
+                `<button class="tab-btn ${i===0?'active':''}" onclick="switchTab('${tabs[i]}',this)">${lbl}</button>`
+            ).join('');
+            document.getElementById('tab-contents').innerHTML = tabs.map((tid, i) =>
+                `<div class="tab-content ${i===0?'active':''}" id="tab_${tid}"></div>`
+            ).join('');
+
+            renderSummaryTab(results, t);
+            const fireRoomRes = results.find(r => r.room.type === 'fire') || results[0];
+            results.forEach((res, i) => renderRoomTab(res, mat, t, `room_${i}`, fireRoomRes));
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`tab_${tabId}`).classList.add('active');
+        }
+
+        function renderSummaryTab(results, t) {
+            const el = document.getElementById('tab_summary');
+            const svgHtml = buildSchematicSVG(results, t);
+
+            const rows = results.map(res => {
+                const rm  = res.room;
+                const T_C = (res.T - 273.15).toFixed(1);
+                const ok  = (ex, val, lim) => ex
+                    ? `<span class="status-ex">⚠ ${val}</span>`
+                    : `<span class="status-ok">✓ ${val}</span>`;
+                const tCrit = res.t_crit !== null
+                    ? `<b style="color:#dc2626">${res.t_crit.toFixed(0)} с</b>`
+                    : `<span class="status-ok">&gt; ${t} с</span>`;
+                const icon = rm.type === 'fire' ? '🔥' : '🚪';
+                const adjInfo = rm.type === 'adjacent' ? `, b×h=${rm.openW}×${rm.openH}м` : '';
+                return `<tr>
+                    <td><b>${icon} ${rm.name}</b><br><small>S=${rm.S}м², H=${rm.H}м${adjInfo}</small></td>
+                    <td>${ok((res.T-273.15)>60, T_C+'°C', '60°C')}</td>
+                    <td>${ok(res.L_vis<20, res.L_vis.toFixed(1)+'м', '20м')}</td>
+                    <td>${ok(res.C_O2<0.226, res.C_O2.toFixed(3), '0.226')}</td>
+                    <td>${ok(res.C_CO2>0.11, res.C_CO2.toFixed(4), '0.11')}</td>
+                    <td>${ok(res.C_CO>1.16e-3, res.C_CO.toExponential(2), '1.16e-3')}</td>
+                    <td>${ok(res.C_HCl>23e-6, res.C_HCl.toExponential(2), '23e-6')}</td>
+                    <td>${tCrit}</td>
+                    <td>${res.Z.toFixed(2)} м</td>
+                </tr>`;
+            }).join('');
+
+            el.innerHTML = `
+                <div class="viz-svg-wrap">${svgHtml}</div>
+                <h3 style="color:var(--primary); margin:0 0 8px;">Зведена таблиця НЧП — t = ${t} с</h3>
+                <div style="overflow-x:auto;">
+                <table class="summary-table">
+                    <thead><tr>
+                        <th>Приміщення</th>
+                        <th>T<br><small>(ГДЗ&lt;60°C)</small></th>
+                        <th>Видимість<br><small>(ГДЗ≥20м)</small></th>
+                        <th>O₂ кг/м³<br><small>(ГДЗ≥0.226)</small></th>
+                        <th>CO₂ кг/м³<br><small>(ГДЗ≤0.11)</small></th>
+                        <th>CO кг/м³<br><small>(ГДЗ≤1.16·10⁻³)</small></th>
+                        <th>HCl кг/м³<br><small>(ГДЗ≤23·10⁻⁶)</small></th>
+                        <th>t_кр</th>
+                        <th>Z, м</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                </div>
+                <div style="margin-top:12px; padding:12px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:6px; font-size:12px; color:#0369a1; line-height:1.6;">
+                    <b>Методика розрахунку G_П (ДСТУ А.8.4):</b>
+                    G_П = μ_д·b·⅔·√(2g·ρ₁·(ρ_a−ρ₁))·δ<sup>3/2</sup>, де δ — висота задимленої частини прорізу,
+                    μ_д = 0,64 — коефіцієнт витікання. Тип вогнища — кругове поширення (А.59–А.71).
+                </div>`;
+        }
+
+        function renderRoomTab(res, mat, t, tabId, fireRoomRes) {
+            const el   = document.getElementById(`tab_${tabId}`);
+            const rm   = res.room;
+            const T_C  = (res.T - 273.15).toFixed(1);
+            const isAdj = rm.type === 'adjacent';
+
+            // Детальні рядки НЧП з формулами розрахунку концентрацій
+            const Lvis_str = res.L_vis < 9999 ? res.L_vis.toFixed(1) : '> 9999';
+            const critBody = [
+                {n:'Температура', ref:'А.61', calc:'T &minus; T<sub>a</sub> = '+res.T.toFixed(2)+' &minus; 293,15 = <b>'+(res.T-273.15).toFixed(1)+' °C</b>',                                                                             val:T_C+' °C',                          cond:'&gt; 60 °C',               ex:(res.T-273.15)>60, c:res.critT},
+                {n:'Видимість L',  ref:'А.62', calc:'L = 2,38 / &mu; = 2,38 / '+res.mu.toFixed(5)+' = <b>'+Lvis_str+' м</b>',                                                                                                              val:Lvis_str+' м',                      cond:'&lt; 20 м',                ex:res.L_vis<20,      c:res.critVis},
+                {n:'O<sub>2</sub>',ref:'А.63', calc:'C<sub>O₂</sub> = m<sub>ox</sub> / V<sub>Д</sub> = '+res.m_ox.toFixed(4)+' / '+res.Vd.toFixed(3)+' = <b>'+res.C_O2.toFixed(4)+' кг/м³</b>',                                           val:res.C_O2.toFixed(4)+' кг/м³',   cond:'&lt; 0,226 кг/м³',         ex:res.C_O2<0.226,    c:res.critO2},
+                {n:'CO<sub>2</sub>',ref:'А.63',calc:'C<sub>CO₂</sub> = m<sub>CO₂</sub> / V<sub>Д</sub> = '+res.m_CO2.toFixed(5)+' / '+res.Vd.toFixed(3)+' = <b>'+res.C_CO2.toFixed(5)+' кг/м³</b>',                                       val:res.C_CO2.toFixed(5)+' кг/м³',  cond:'&gt; 0,11 кг/м³',          ex:res.C_CO2>0.11,    c:res.critCO2},
+                {n:'CO',          ref:'А.63', calc:'C<sub>CO</sub> = m<sub>CO</sub> / V<sub>Д</sub> = '+res.m_CO.toFixed(6)+' / '+res.Vd.toFixed(3)+' = <b>'+res.C_CO.toExponential(3)+' кг/м³</b>',                                       val:res.C_CO.toExponential(2)+' кг/м³', cond:'&gt; 1,16&middot;10<sup>&minus;3</sup>', ex:res.C_CO>1.16e-3, c:res.critCO},
+                {n:'HCl',         ref:'А.63', calc:'C<sub>HCl</sub> = m<sub>HCl</sub> / V<sub>Д</sub> = '+res.m_HCl.toFixed(7)+' / '+res.Vd.toFixed(3)+' = <b>'+res.C_HCl.toExponential(3)+' кг/м³</b>',                                  val:res.C_HCl.toExponential(2)+' кг/м³', cond:'&gt; 23&middot;10<sup>&minus;6</sup>',  ex:res.C_HCl>23e-6,  c:res.critHCl},
+            ].map(r => '<tr>'
+                +'<td><b>'+r.n+'</b><br><small style="color:#94a3b8;">'+r.ref+'</small></td>'
+                +'<td style="font-size:12px; line-height:1.6;">'+r.calc+'</td>'
+                +'<td style="text-align:center; font-weight:bold; color:'+(r.ex?'#dc2626':'#059669')+';">'+r.val+'</td>'
+                +'<td style="text-align:center; font-size:12px;">'+r.cond+'</td>'
+                +'<td>'+(r.ex?'<span class="status-ex">⚠ ПЕРЕВИЩЕНО</span>':'<span class="status-ok">✓ норма</span>')+'</td>'
+                +'<td>'+(r.c!==null?'<b style="color:#dc2626">'+r.c.toFixed(0)+' с</b>':'<span class="status-ok">&gt; '+t+' с</span>')+'</td>'
+                +'</tr>').join('');
+            // Таблиця t_кр
+            const tCritRows = [
+                {n:'Температура', c:res.critT,   cond:'(T &minus; 273,15) &gt; 60 °C'},
+                {n:'Видимість L', c:res.critVis, cond:'L = 2,38/&mu; &lt; 20 м'},
+                {n:'O₂',         c:res.critO2,  cond:'C<sub>O₂</sub> &lt; 0,226 кг/м³'},
+                {n:'CO₂',        c:res.critCO2, cond:'C<sub>CO₂</sub> &gt; 0,11 кг/м³'},
+                {n:'CO',         c:res.critCO,  cond:'C<sub>CO</sub> &gt; 1,16&middot;10<sup>&minus;3</sup> кг/м³'},
+                {n:'HCl',        c:res.critHCl, cond:'C<sub>HCl</sub> &gt; 23&middot;10<sup>&minus;6</sup> кг/м³'},
+            ].map(r => {
+                const isCrit = res.t_crit!==null && r.c!==null && Math.abs(r.c - res.t_crit) < 0.6;
+                return '<tr style="'+(isCrit?'background:#fef2f2;':'')+'">'
+                    +'<td style="padding:5px 8px;border:1px solid #e2e8f0;">'+r.n+'</td>'
+                    +'<td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center;font-size:11px;">'+r.cond+'</td>'
+                    +'<td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center;'+(r.c!==null?'color:#dc2626;font-weight:bold;':'color:#16a34a;')+'">'
+                    +(r.c!==null?r.c.toFixed(0)+' с':'&gt; '+t+' с')+'</td>'
+                    +'<td style="padding:5px 8px;border:1px solid #e2e8f0;text-align:center;">'+(isCrit?'&#x2190; <b>t<sub>кр</sub></b>':'—')+'</td></tr>';
+            }).join('');
+            const tCritSummary = res.t_crit!==null
+                ? '<b>t<sub>кр</sub> = '+res.t_crit.toFixed(0)+' с</b> — необхідно завершити евакуацію до цього моменту.'
+                : '<b>Критичний час не досягнуто за '+t+' с</b> — усі НЧП протягом розрахункового часу не перевищують ГДЗ.';
+
+            const tCritStr = res.t_crit !== null
+                ? `<span class="status-ex">⚠ ${res.t_crit.toFixed(0)} с</span>`
+                : `<span class="status-ok">Не досягнуто за ${t} с</span>`;
+
+            // Формули для вогнища
+            let gkStr = '', gkArea = '';
+            if (!isAdj) {
+                if (res.zeta < 0.081)      { gkStr = `0{,}011 Q \\left(\\tfrac{Z}{Q^{2/5}}\\right)^{0{,}566}`; gkArea = 'факел'; }
+                else if (res.zeta < 0.206) { gkStr = `0{,}026 Q \\left(\\tfrac{Z}{Q^{2/5}}\\right)^{0{,}909}`; gkArea = 'перехідна'; }
+                else                       { gkStr = `0{,}124 Q \\left(\\tfrac{Z}{Q^{2/5}}\\right)^{1{,}895}`; gkArea = 'конв. колонка'; }
+            }
+
+            const adjGpInfo = isAdj ? `<p><b>Поточна витрата G_П:</b> <span class="result-val">${res.Gp.toFixed(4)} кг/с</span>
+                — проріз b=${rm.openW}м × h=${rm.openH}м, підвіконня ${rm.openSill}м</p>` : '';
+
+            el.innerHTML = `
+                <h3 style="margin:0 0 4px; color:var(--primary);">${rm.type==='fire'?'🔥 Приміщення з вогнищем':'🚪 Суміжне приміщення — надходження диму через проріз'}</h3>
+                <h4 style="margin:0 0 10px; font-weight:normal; color:#374151;">${rm.name} — S=${rm.S} м², H=${rm.H} м</h4>
+                <p><b>Критичний час евакуації t_кр:</b> ${tCritStr}</p>
+                ${adjGpInfo}
+                <table class="summary-table" style="margin-bottom:20px;">
+                    <thead><tr><th>НЧП</th><th>Детальний розрахунок (t = ${t} с)</th><th>Значення</th><th>ГДЗ умова</th><th>Статус</th><th>Час перевищення</th></tr></thead>
+                    <tbody>${critBody}</tbody>
+                </table>
+
+                ${!isAdj ? `
+                <div class="calc-step">
+                    <span class="step-h">А.71 — Вогнище пожежі</span>
+                    <div class="formula-box" id="${tabId}_a71a"></div>
+                    <div class="formula-box" id="${tabId}_a71b"></div>
+                </div>
+                <div class="calc-step">
+                    <span class="step-h">А.70 — Конвективна колонка (область: ${gkArea}, ζ=${res.zeta.toFixed(4)})</span>
+                    <div class="formula-box" id="${tabId}_a70"></div>
+                </div>
+                <div class="calc-step">
+                    <span class="step-h">А.65–А.69 — Балансові рівняння (з урахуванням G_П)</span>
+                    <div class="formula-box" id="${tabId}_a65"></div>
+                    <div class="formula-box" id="${tabId}_a66"></div>
+                    <div class="formula-box" id="${tabId}_a67"></div>
+                    <div class="formula-box" id="${tabId}_a68"></div>
+                    <div class="formula-box" id="${tabId}_a69"></div>
+                </div>` : `
+                <div class="calc-step">
+                    <span class="step-h">G_П — витрата диму через проріз (ДСТУ А.8.4)</span>
+                    <div class="formula-box" id="${tabId}_gp"></div>
+                </div>
+                <div class="calc-step">
+                    <span class="step-h">А.65–А.69 — Балансові рівняння суміжного приміщення (G_К = 0)</span>
+                    <div class="formula-box" id="${tabId}_a65adj"></div>
+                    <div class="formula-box" id="${tabId}_a66adj"></div>
+                    <div class="formula-box" id="${tabId}_a67adj"></div>
+                    <div class="formula-box" id="${tabId}_a68adj"></div>
+                    <div class="formula-box" id="${tabId}_a69adj"></div>
+                </div>`}
+
+                <div class="calc-step">
+                    <span class="step-h">А.61–А.64 — Параметри задимленої зони (t = ${t} с)</span>
+                    <div class="formula-box" id="${tabId}_a64z"></div>
+                    <div class="formula-box" id="${tabId}_a61"></div>
+                    <div class="formula-box" id="${tabId}_a63"></div>
+                </div>
+                <div class="calc-step" style="border-left-color:#dc2626;">
+                    <span class="step-h" style="color:#dc2626;">А.8.1 — Визначення критичного часу евакуації t_кр</span>
+                    <p style="font-size:13px; margin:0 0 10px; color:#374151; line-height:1.7;">
+                        <b>Метод:</b> числове інтегрування системи ОДР А.65–А.69 методом Ейлера з кроком &Delta;t&nbsp;=&nbsp;0,5&nbsp;с
+                        від <i>t</i>&nbsp;=&nbsp;0 до <i>t</i>&nbsp;=&nbsp;${t}&nbsp;с. На кожному кроці обчислюються концентрації НЧП
+                        і перевіряються умови перевищення ГДЗ. Критичний час&nbsp;&mdash; найменший момент,
+                        коли хоча б один НЧП виходить за своє ГДЗ:
+                    </p>
+                    <div class="formula-box" id="${tabId}_tcrit_eq"></div>
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;">
+                        <thead><tr style="background:#fee2e2;">
+                            <th style="padding:6px 10px;text-align:left;border:1px solid #fca5a5;">НЧП</th>
+                            <th style="padding:6px 10px;border:1px solid #fca5a5;">Умова перевищення ГДЗ</th>
+                            <th style="padding:6px 10px;border:1px solid #fca5a5;">Час перевищення t<sub>x</sub></th>
+                            <th style="padding:6px 10px;border:1px solid #fca5a5;">Визначає t<sub>кр</sub></th>
+                        </tr></thead>
+                        <tbody>${tCritRows}</tbody>
+                    </table>
+                    <p style="font-size:13px;margin:10px 0 0;padding:10px 14px;background:#fef2f2;border-radius:4px;color:#991b1b;">${tCritSummary}</p>
+                </div>`;
+
+            // Рендер KaTeX
+            const S = rm.S, H = rm.H;
+            const v = mat.v_spread, psi = mat.psi_ud, q = mat.q_low, Dm = mat.smoke_capacity;
+
+            const kOpts = {displayMode:true, throwOnError:false};
+            if (!isAdj) {
+                try { katex.render(`F(t) = \\pi v^2 t^2 = \\pi \\cdot ${v}^2 \\cdot ${t}^2 = ${res.F_fire.toFixed(2)}\\;\\text{м}^2`+(res.F_fire>=S?`\\;(\\text{обмежено }S=${S})` : ''),
+                    document.getElementById(`${tabId}_a71a`), kOpts); } catch(e) { document.getElementById(`${tabId}_a71a`).textContent = `F(t)=π·v²·t²=${res.F_fire.toFixed(2)} м²`; }
+                try { katex.render(`(\\text{А.71})\\quad Q = \\eta \\psi_{\\text{пит}} Q_{\\text{н}} F = 0{,}7 \\cdot ${psi} \\cdot ${q} \\cdot ${res.F_fire.toFixed(2)} = ${res.Q_fire.toFixed(1)}\\;\\text{кВт}`,
+                    document.getElementById(`${tabId}_a71b`), kOpts); } catch(e) { document.getElementById(`${tabId}_a71b`).textContent = `А.71: Q = 0.7·ψ·Qн·F = ${res.Q_fire.toFixed(1)} кВт`; }
+                try { katex.render(`(\\text{А.70})\\quad G_K = ${gkStr} = ${res.Gk.toFixed(4)}\\;\\text{кг/с}`,
+                    document.getElementById(`${tabId}_a70`), kOpts); } catch(e) { document.getElementById(`${tabId}_a70`).textContent = `А.70: G_K = ${res.Gk.toFixed(4)} кг/с`; }
+                try { katex.render(`(\\text{А.65})\\quad \\tfrac{dm}{dt} = G_K - G_{\\Pi} \\;\\Rightarrow\\; m(${t}\\text{ с}) = ${res.m.toFixed(4)}\\;\\text{кг}`,
+                    document.getElementById(`${tabId}_a65`), kOpts); } catch(e) { document.getElementById(`${tabId}_a65`).textContent = `А.65: dm/dt=G_K−G_П → m(${t}с)=${res.m.toFixed(4)} кг`; }
+                try { katex.render(`(\\text{А.66})\\quad \\tfrac{dQ_{\\text{З}}}{dt} = Q - G_{\\Pi} c_P(T_1 - T_a) \\;\\Rightarrow\\; Q_{\\text{З}} = ${res.Qz.toFixed(1)}\\;\\text{кДж}`,
+                    document.getElementById(`${tabId}_a66`), kOpts); } catch(e) { document.getElementById(`${tabId}_a66`).textContent = `А.66: dQ_З/dt = Q−G_П·cp·(T₁−Tₐ) → Q_З=${res.Qz.toFixed(1)} кДж`; }
+                try { katex.render(`(\\text{А.67})\\quad \\tfrac{dm_{\\text{ox}}}{dt} = 0{,}23(G_K - \\eta \\Psi L_{\\text{ox}}) - x_{\\text{ox}} G_{\\Pi} \\;\\Rightarrow\\; m_{\\text{ox}} = ${res.m_ox.toFixed(4)}\\;\\text{кг}`,
+                    document.getElementById(`${tabId}_a67`), kOpts); } catch(e) { document.getElementById(`${tabId}_a67`).textContent = `А.67: dm_ox/dt = 0.23(G_K−ηΨL_ox)−x_ox·G_П → m_ox=${res.m_ox.toFixed(4)} кг`; }
+                try { katex.render(`(\\text{А.68})\\quad \\tfrac{dS}{dt} = \\Psi D_m - \\tfrac{S}{m} G_{\\Pi} \\;\\Rightarrow\\; S = ${res.S.toFixed(3)}\\;\\text{Нп}\\cdot\\text{м}^2`,
+                    document.getElementById(`${tabId}_a68`), kOpts); } catch(e) { document.getElementById(`${tabId}_a68`).textContent = `А.68: dS/dt = Ψ·Dm−(S/m)·G_П → S=${res.S.toFixed(3)} Нп·м²`; }
+                try { katex.render(`(\\text{А.69})\\quad \\tfrac{dm_{\\text{CO}_2}}{dt} = \\Psi L_{\\text{CO}_2} - x_{\\text{CO}_2} G_{\\Pi} \\;\\Rightarrow\\; m_{\\text{CO}_2} = ${res.m_CO2.toFixed(4)}\\;\\text{кг}`,
+                    document.getElementById(`${tabId}_a69`), kOpts); } catch(e) { document.getElementById(`${tabId}_a69`).textContent = `А.69: dm_CO₂/dt = Ψ·L_CO₂−x_CO₂·G_П → m_CO₂=${res.m_CO2.toFixed(4)} кг`; }
+            } else {
+                // Для G_П використовуємо параметри ПРИМІЩЕННЯ З ВОГНИЩЕМ (rho1, Z — звідти надходить дим)
+                const rho_a = 1.2, T_a = 293.15;
+                const srcR = fireRoomRes || res;
+                const rho1 = srcR.rho;                            // щільність диму у вогнищі
+                const drho = Math.max(0, rho_a - rho1);           // (ρ_a − ρ₁)
+                const delta = Math.max(0, (rm.openSill + rm.openH) - Math.max(srcR.Z, rm.openSill)); // задимлена висота прорізу
+                const kOpts = {displayMode:true, throwOnError:false};
+                try { katex.render(
+                    `G_{\\Pi} = \\mu_{\\text{d}} \\cdot b \\cdot \\tfrac{2}{3} \\cdot \\sqrt{2g\\rho_1(\\rho_a - \\rho_1)} \\cdot \\delta^{3/2}`
+                    + ` = 0{,}64 \\cdot ${rm.openW} \\cdot \\tfrac{2}{3} \\cdot \\sqrt{2 \\cdot 9{,}81 \\cdot ${rho1.toFixed(3)} \\cdot ${drho.toFixed(3)}} \\cdot ${delta.toFixed(3)}^{3/2}`
+                    + ` = ${res.Gp.toFixed(4)} \\;\\text{кг/с}\\quad`
+                    + ` (Z_1 = ${srcR.Z.toFixed(2)}\\text{ м},\\; \\delta = ${delta.toFixed(3)}\\text{ м})`,
+                    document.getElementById(`${tabId}_gp`), kOpts); } catch(e) {
+                    document.getElementById(`${tabId}_gp`).textContent = `G_П = ${res.Gp.toFixed(4)} кг/с  (δ=${delta.toFixed(3)} м, Z₁=${srcR.Z.toFixed(2)} м)`; }
+                try { katex.render(`(\\text{А.65})\\quad \\tfrac{dm_2}{dt} = G_{\\Pi} \\;\\Rightarrow\\; m_2(${t}\\text{ с}) = ${res.m.toFixed(4)}\\;\\text{кг}`,
+                    document.getElementById(`${tabId}_a65adj`), kOpts); } catch(e) {
+                    document.getElementById(`${tabId}_a65adj`).textContent = `А.65: dm₂/dt = G_П → m₂(${t}с) = ${res.m.toFixed(4)} кг`; }
+                try { katex.render(`(\\text{А.66})\\quad \\tfrac{dQ_{\\text{З},2}}{dt} = G_{\\Pi} c_P (T_1 - T_a) \\;\\Rightarrow\\; Q_{\\text{З},2} = ${res.Qz.toFixed(1)}\\;\\text{кДж}`,
+                    document.getElementById(`${tabId}_a66adj`), kOpts); } catch(e) {
+                    document.getElementById(`${tabId}_a66adj`).textContent = `А.66: dQ₂/dt = G_П·cp·(T₁−Tₐ) → Q_З₂ = ${res.Qz.toFixed(1)} кДж`; }
+                try { katex.render(`(\\text{А.67})\\quad \\tfrac{dm_{\\text{ox},2}}{dt} = G_{\\Pi} x_{\\text{ox},1} \\;\\Rightarrow\\; m_{\\text{ox},2} = ${res.m_ox.toFixed(4)}\\;\\text{кг}`,
+                    document.getElementById(`${tabId}_a67adj`), kOpts); } catch(e) {
+                    document.getElementById(`${tabId}_a67adj`).textContent = `А.67: dm_ox₂/dt = G_П·x_ox₁ → m_ox₂ = ${res.m_ox.toFixed(4)} кг`; }
+                try { katex.render(`(\\text{А.68})\\quad \\tfrac{dS_2}{dt} = G_{\\Pi} \\cdot \\tfrac{S_1}{m_1} \\;\\Rightarrow\\; S_2 = ${res.S.toFixed(3)}\\;\\text{Нп}\\cdot\\text{м}^2`,
+                    document.getElementById(`${tabId}_a68adj`), kOpts); } catch(e) {
+                    document.getElementById(`${tabId}_a68adj`).textContent = `А.68: dS₂/dt = G_П·(S₁/m₁) → S₂ = ${res.S.toFixed(3)} Нп·м²`; }
+                try { katex.render(`(\\text{А.69})\\quad \\tfrac{dm_{\\text{CO}_2,2}}{dt} = G_{\\Pi} x_{\\text{CO}_2,1} \\;\\Rightarrow\\; m_{\\text{CO}_2,2} = ${res.m_CO2.toFixed(4)}\\;\\text{кг}`,
+                    document.getElementById(`${tabId}_a69adj`), kOpts); } catch(e) {
+                    document.getElementById(`${tabId}_a69adj`).textContent = `А.69: dm_CO₂₂/dt = G_П·x_CO₂₁ → m_CO₂₂ = ${res.m_CO2.toFixed(4)} кг`; }
+            }
+
+            // Спільні формули А.61–А.64
+            try { katex.render(`(\\text{А.64})\\quad Z = H - \\tfrac{V_{\\text{Д}}}{A} = ${H} - \\tfrac{${res.Vd.toFixed(3)}}{${S}} = ${res.Z.toFixed(3)}\\;\\text{м}`,
+                document.getElementById(`${tabId}_a64z`), kOpts); } catch(e) { document.getElementById(`${tabId}_a64z`).textContent = `А.64: Z = H−V_Д/A = ${H}−${res.Vd.toFixed(3)}/${S} = ${res.Z.toFixed(3)} м`; }
+            try { katex.render(`(\\text{А.61})\\quad T = T_a + \\tfrac{Q_{\\text{З}}}{m c_P} = 293{,}15 + \\tfrac{${res.Qz.toFixed(1)}}{${res.m.toFixed(4)} \\cdot 1{,}005} = ${res.T.toFixed(1)}\\;\\text{К}\\;(${T_C}\\;\\text{°C})`,
+                document.getElementById(`${tabId}_a61`), kOpts); } catch(e) { document.getElementById(`${tabId}_a61`).textContent = `А.61: T = Tₐ+Q_З/(m·cp) = ${res.T.toFixed(1)} К (${T_C}°C)`; }
+            try { katex.render(`(\\text{А.63})\\quad \\mu = \\tfrac{S}{V_{\\text{Д}}} = \\tfrac{${res.S.toFixed(3)}}{${res.Vd.toFixed(3)}} = ${res.mu.toFixed(4)}\\;\\text{Нп/м}`,
+                document.getElementById(`${tabId}_a63`), kOpts); } catch(e) { document.getElementById(`${tabId}_a63`).textContent = `А.63: μ = S/V_Д = ${res.S.toFixed(3)}/${res.Vd.toFixed(3)} = ${res.mu.toFixed(4)} Нп/м`; }
+            // А.8.1 — Критичний час
+            const tCritVal = res.t_crit !== null ? res.t_crit.toFixed(0)+'\\;\\text{с}' : `> ${t}\\;\\text{с}`;
+            try { katex.render(`t_{\\text{кр}} = \\min(t_T,\\; t_L,\\; t_{O_2},\\; t_{CO_2},\\; t_{CO},\\; t_{HCl}) = ${tCritVal}`,
+                document.getElementById(`${tabId}_tcrit_eq`), kOpts); } catch(e) { document.getElementById(`${tabId}_tcrit_eq`).textContent = `t_кр = min(t_T, t_L, t_O₂, t_CO₂, t_CO, t_HCl) = ${res.t_crit !== null ? res.t_crit.toFixed(0)+' с' : '> '+t+' с'}`; }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
